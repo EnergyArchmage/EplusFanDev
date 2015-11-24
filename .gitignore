@@ -1,43 +1,46 @@
-# Windows image file caches
-Thumbs.db
-ehthumbs.db
-
-# Folder config file
-Desktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
-
-# =========================
-# Operating System Files
-# =========================
-
-# OSX
-# =========================
-
+*.a
+*.d
+*.dll
+*.exe
+*.gcda
+*.ilk
+*.lib
+*.log
+*.map
+*.o
+*.o-*
+*.obj
+*.orig
+*.pdb
+*.res
+*.so
+*.so.*
+*~
+.directory
 .DS_Store
-.AppleDouble
-.LSOverride
 
-# Thumbnails
-._*
+# now that we have python, ignore some things
+*.pyc
 
-# Files that might appear on external disk
-.Spotlight-V100
-.Trashes
+# ignore the site build folder for mkdocs
+doc/src/site*
+# and also ignore the concatenated markdown docs that are temporarily created for the pdf target
+doc/src/docs/EngineeringReference/EngRef.md
+doc/src/docs/InputOutputReference/IORef.md
+# and oddly enough we want to ignore the mkdocs yml file that is created conditionally depending on html vs pdf target
+doc/src/mkdocs.yml
 
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
+# build folder, if the dev chooses to put it there
+#  could also do a wildcard for build-* if we suggest that naming approach
+#  which could be useful for: build-eclipse, build-vs2013, build, etc.
+build
+builds
+Build
+Builds
+
+# App-specific project files, for example, for Geany IDE:
+*.geany
+.project
+.cproject
+.idea
+
