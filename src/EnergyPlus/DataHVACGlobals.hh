@@ -512,7 +512,7 @@ namespace DataHVACGlobals {
 	extern OptStartDataType OptStartData; // For optimum start
 	extern Array1D< ComponentSetPtData > CompSetPtEquip;
 
-	extern std::vector< std::unique_ptr < Fan > > fanObjs;
+	extern std::vector< std::unique_ptr < FanModel::Fan > > fanObjs;
 	// Clears the global data in DataHVACGlobals.
 	// Needed for unit tests, should not be normally called.
 	void

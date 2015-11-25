@@ -1,5 +1,7 @@
 // C++ Headers
 #include <cmath>
+#include <vector>
+#include <memory>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -30,6 +32,7 @@
 #include <EMSManager.hh>
 #include <EvaporativeCoolers.hh>
 #include <Fans.hh>
+#include <FanObject.hh>
 #include <Furnaces.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -138,6 +141,7 @@ namespace SimAirServingZones {
 	int const Fan_ComponentModel( 25 ); // cpw22Aug2010 (new)
 	int const DXHeatPumpSystem( 26 );
 	int const CoilUserDefined( 27 );
+	int const Fan_Simple_Object( 28 );
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -1113,7 +1117,12 @@ namespace SimAirServingZones {
 
 					} else if ( componentType == "FAN:VARIABLEVOLUME" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Fan_Simple_VAV;
-
+					
+					} else if ( componentType == "FAN:SYSTEMMODEL") {
+						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Fan_Simple_Object;
+						//Construct fan object 
+						DataHVACGlobals::fanObjs.emplace_back( std::make_unique < FanModel::Fan > ( PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).Name ) );
+						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompIndex = DataHVACGlobals::fanObjs.size();
 						// cpw22Aug2010 Add Fan_ComponentModel type (new num=24)
 					} else if ( componentType == "FAN:COMPONENTMODEL" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = Fan_ComponentModel;
@@ -1816,7 +1825,7 @@ namespace SimAirServingZones {
 						if ( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num == OAMixer_Num ) {
 							FoundOASys = true;
 						}
-						if ( CompTypeNum == Fan_Simple_CV || CompTypeNum == Fan_Simple_VAV || CompTypeNum == Fan_ComponentModel ) {
+						if ( CompTypeNum == Fan_Simple_CV || CompTypeNum == Fan_Simple_VAV || CompTypeNum == Fan_ComponentModel || CompTypeNum ==  Fan_Simple_Object ) {
 							if ( PrimaryAirSystem(AirLoopNum).OASysExists ) {
 								if ( FoundOASys ) {
 									if ( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3 ) {
@@ -2825,7 +2834,10 @@ namespace SimAirServingZones {
 			SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 
 		} else if ( SELECT_CASE_var == FanType_SystemModelObject ) { // "Fan:SystemModel" new for V8.5
-			DataHVACGlobals::fanObjs[ CompIndex ]->simulate();
+			if ( CompIndex == 0 ) { // 0 means has not been filled because of 1-based arrays in old fortran
+				CompIndex = FanModel::getFanObjectVectorIndex( CompName ) + 1;
+			}
+			DataHVACGlobals::fanObjs[ CompIndex - 1 ]->simulate(); // vector is 0 based, but CompIndex is 1 based so shift 
 
 			// cpw22Aug2010 Add Fan:ComponentModel (new)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'
