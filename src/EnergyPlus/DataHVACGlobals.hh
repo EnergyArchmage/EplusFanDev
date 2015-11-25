@@ -1,12 +1,16 @@
 #ifndef DataHVACGlobals_hh_INCLUDED
 #define DataHVACGlobals_hh_INCLUDED
 
+// C++ Headers
+#include <memory>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <FanObject.hh>
 
 namespace EnergyPlus {
 
@@ -90,6 +94,8 @@ namespace DataHVACGlobals {
 	extern int const FanType_SimpleOnOff;
 	extern int const FanType_ZoneExhaust;
 	extern int const FanType_ComponentModel; // cpw22Aug2010 (new)
+	extern int const FanType_SystemModelObject; // 
+
 	// Fan Minimum Flow Fraction Input Method
 	extern int const MinFrac;
 	extern int const FixedMin;
@@ -506,6 +512,7 @@ namespace DataHVACGlobals {
 	extern OptStartDataType OptStartData; // For optimum start
 	extern Array1D< ComponentSetPtData > CompSetPtEquip;
 
+	extern std::vector< std::unique_ptr < Fan > > fanObjs;
 	// Clears the global data in DataHVACGlobals.
 	// Needed for unit tests, should not be normally called.
 	void

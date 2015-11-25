@@ -2824,6 +2824,9 @@ namespace SimAirServingZones {
 		} else if ( SELECT_CASE_var == Fan_Simple_VAV ) { // 'Fan:VariableVolume'
 			SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 
+		} else if ( SELECT_CASE_var == FanType_SystemModelObject ) { // "Fan:SystemModel" new for V8.5
+			DataHVACGlobals::fanObjs[ CompIndex ]->simulate();
+
 			// cpw22Aug2010 Add Fan:ComponentModel (new)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'
 			SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );

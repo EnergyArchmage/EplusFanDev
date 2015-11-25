@@ -209,6 +209,8 @@ SET( SRC
   ExternalInterface.hh
   FanCoilUnits.cc
   FanCoilUnits.hh
+  FanObject.cc
+  FanObject.hh
   Fans.cc
   Fans.hh
   FaultsManager.cc
