@@ -40574,7 +40574,7 @@ ZoneHVAC:EquipmentConnections,
 
 \group Fans
 !*****************AIR LOOP COMPONENTS*********************
-Fan,
+Fan:SystemModel,
        \memo Versatile simple fan that can be used in variable air volume, constant volume, or on-off cycling applications.
        \memo Performance at different flow rates, or speed levels, is determined using separate performance curve or table
        \memo or prescribed power fractions at discrete speed levels for two-speed or multi-speed fans.
@@ -40610,9 +40610,9 @@ Fan,
        \default Discrete
   N2 , \field Electric Power Minimum Flow Rate Fraction
        \type real
+       \default 0.2      
        \minimum 0.0
        \maximum 1.0
-       \default 0.2
   N3 , \field Design Pressure Rise
        \type real
        \units Pa
@@ -40639,7 +40639,7 @@ Fan,
        \type choice
        \key PowerPerFlow
        \key PowerPerFlowPerPressure
-       \key TotalEfficiency
+       \key TotalEfficiencyAndPressure
        \default PowerPerFlowPerPressure
   N7 , \field Electric Power Per Unit Flow Rate
        \type real
@@ -40651,7 +40651,7 @@ Fan,
        \units W/((m3/s) -Pa)
        \ip-units W/((ft3/min)-inH2O)
        \default 1.66667
-  N9,  \field Fan Total Efficiency
+  N9,  \field Fan Total Efficiency 
        \type real
        \default 0.7
        \minimum>0.0
