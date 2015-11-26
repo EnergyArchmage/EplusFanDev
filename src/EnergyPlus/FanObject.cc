@@ -13,10 +13,15 @@
 #include <CurveManager.hh>
 #include <DataHeatBalance.hh>
 #include <OutputProcessor.hh>
+#include <General.hh>
+#include <EMSManager.hh>
+#include <ObjexxFCL/Optional.hh>
 
 namespace EnergyPlus {
 
 namespace FanModel {
+
+	std::vector < std::unique_ptr <HVACFan> > fanObjs;
 
 	int
 	getFanObjectVectorIndex(  // lookup vector index for fan object name in object array DataHVACGlobals::fanObjs
@@ -25,8 +30,8 @@ namespace FanModel {
 	{
 		int index = -1;
 		bool found = false;
-		for ( auto loop = 0; loop < DataHVACGlobals::fanObjs.size(); ++loop ) {
-			if ( objectName == DataHVACGlobals::fanObjs[ loop ]->getFanName() ) {
+		for ( auto loop = 0; loop < fanObjs.size(); ++loop ) {
+			if ( objectName == fanObjs[ loop ]->getFanName() ) {
 				if ( ! found ) {
 					index = loop;
 					found = true;
@@ -40,13 +45,49 @@ namespace FanModel {
 	}
 
 	void
-	Fan::simulate()
+	HVACFan::simulate(
+		bool const firstHVACIteration,
+		Optional< Real64 const > speedRatio,
+		Optional_bool_const zoneCompTurnFansOn, // Turn fans ON signal from ZoneHVAC component
+		Optional_bool_const zoneCompTurnFansOff, // Turn Fans OFF signal from ZoneHVAC component
+		Optional< Real64 const > pressureRise // Pressure difference to use for DeltaPress
+	)
 	{
-	
+
+		this->localTurnFansOn = false;
+		this->localTurnFansOff = false;
+
+		this->init( firstHVACIteration );
+
+		if ( present( zoneCompTurnFansOn ) && present( zoneCompTurnFansOff ) ) {
+			// Set module-level logic flags equal to ZoneCompTurnFansOn and ZoneCompTurnFansOff values passed into this routine
+			// for ZoneHVAC components with system availability managers defined.
+			// The module-level flags get used in the other subroutines (e.g., SimSimpleFan,SimVariableVolumeFan and SimOnOffFan)
+			this->localTurnFansOn = zoneCompTurnFansOn;
+			this->localTurnFansOff = zoneCompTurnFansOff;
+		} else {
+			// Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
+			this->localTurnFansOn = DataHVACGlobals::TurnFansOn;
+			this->localTurnFansOff = DataHVACGlobals::TurnFansOff;
+		}
+
+		this->calcSimpleSystemFan();
+
+		this->update();
+
+		this->report();
+
+	}
+
+	void
+	init(
+		bool const firstHVACIteration
+	)
+	{
 	
 	}
 
-	Fan::Fan( // constructor
+	HVACFan::HVACFan( // constructor
 		std::string const objectName
 	)
 	{
@@ -153,12 +194,12 @@ namespace FanModel {
 		} else {
 			this->numSpeeds =  1;
 		}
-
+		this->fanRunTimeFractionSpeed.resize(this->numSpeeds, 0.0);
 		if ( this->speedControl == speedControlDiscrete && this->numSpeeds > 1 ) {
 			//should have field sets 
 			this->flowFractionSpeed.resize(this->numSpeeds, 0.0);
 			this->powerFractionSpeed.resize(this->numSpeeds, 0.0);
-			this->fanRunTimeFractionSpeed.resize(this->numSpeeds, 0.0);
+
 			if ( this->numSpeeds == (( numNums - 13 ) / 2 ) || this->numSpeeds == (( numNums + 1 - 13 ) / 2 ) ) {
 				for ( auto loopSet = 0 ; loopSet< this->numSpeeds; ++loopSet ) {
 					this->flowFractionSpeed[ loopSet ]  = DataIPShortCuts::rNumericArgs( 13 + loopSet * 2 + 1 );
@@ -172,9 +213,6 @@ namespace FanModel {
 			}
 		}
 
-
-
-
 		if ( errorsFound ) {
 			ShowFatalError( routineName + "Errors found in input.  Program terminates." );
 		}
@@ -182,11 +220,24 @@ namespace FanModel {
 		SetupOutputVariable( "Fan Electric Power [W]", this->fanPower, "System", "Average", this->name );
 		SetupOutputVariable( "Fan Rise in Air Temperature [deltaC]", this->deltaTemp, "System", "Average", this->name );
 		SetupOutputVariable( "Fan Electric Energy [J]", this->fanEnergy, "System", "Sum", this->name, _, "Electric", "Fans", this->endUseSubcategoryName, "System" );
-		for (auto speedLoop = 0; speedLoop < this->numSpeeds; ++speedLoop) {
-		
-		
+		if ( this->speedControl == speedControlDiscrete && this->numSpeeds == 1 ) {
+			SetupOutputVariable( "Fan Runtime Fraction []", this->fanRunTimeFractionSpeed[ 0 ], "System", "Average", this->name );
+		} else if ( this->speedControl == speedControlDiscrete && this->numSpeeds > 1 ) {
+			for (auto speedLoop = 0; speedLoop < this->numSpeeds; ++speedLoop) {
+				SetupOutputVariable( "Fan Runtime Fraction Speed " + General::TrimSigDigits( speedLoop + 1 ) + " []", this->fanRunTimeFractionSpeed[ speedLoop ], "System", "Average", this->name );
+			}
 		}
 
+		if ( DataGlobals::AnyEnergyManagementSystemInModel ) {
+			SetupEMSInternalVariable( "Fan Maximum Mass Flow Rate", this->name , "[kg/s]", this->maxAirMassFlowRate );
+			SetupEMSActuator( "Fan", this->name , "Fan Air Mass Flow Rate", "[kg/s]", this->eMSMaxMassFlowOverrideOn, this->eMSAirMassFlowValue );
+			SetupEMSInternalVariable( "Fan Nominal Pressure Rise", this->name , "[Pa]", this->deltaPress );
+			SetupEMSActuator( "Fan", this->name , "Fan Pressure Rise", "[Pa]", this->eMSFanPressureOverrideOn, this->eMSFanPressureValue );
+			SetupEMSInternalVariable( "Fan Nominal Total Efficiency", this->name, "[fraction]", this->fanTotalEff );
+			SetupEMSActuator( "Fan",this->name , "Fan Total Efficiency", "[fraction]", this->eMSFanEffOverrideOn, this->eMSFanEffValue );
+			SetupEMSActuator( "Fan", this->name , "Fan Autosized Air Flow Rate", "[m3/s]", this->maxAirFlowRateEMSOverrideOn, this->maxAirFlowRateEMSOverrideValue );
+		}
+		EMSManager::ManageEMS( DataGlobals::emsCallFromComponentGetInput );
 	}
 
 

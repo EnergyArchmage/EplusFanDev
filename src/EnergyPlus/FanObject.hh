@@ -6,7 +6,7 @@
 #include <vector>
 #include <memory>
 
-//#include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/Optional.hh>
 
 
 // EnergyPlus Headers
@@ -19,40 +19,47 @@ namespace EnergyPlus {
 
 namespace FanModel {
 
+
+
 	int
 	getFanObjectVectorIndex(
 		std::string const objectName
 	);
 
-class Fan {
+class HVACFan
+{
 
 private: // Creation
 	// Default Constructor
-	Fan() :
+	HVACFan() :
 	name( "")
 	{}
 
 	// Copy Constructor
-	Fan( Fan const & ) = default;
+	HVACFan( HVACFan const & ) = default;
 
 	// Move Constructor
 #if !defined(_MSC_VER) || defined(__INTEL_COMPILER) || (_MSC_VER>=1900)
-	Fan( Fan && ) = default;
+	HVACFan( HVACFan && ) = default;
 #endif
 
 public: // Methods
 	// Destructor
-	~Fan()
+	~HVACFan()
 	{}
 
 	// Constructor
-	Fan(
+	HVACFan(
 		std::string const objectName
 	);
 
 	void
 	simulate(
-	
+		bool const FirstHVACIteration,
+		Optional< Real64 const > SpeedRatio,
+		Optional_bool_const ZoneCompTurnFansOn, // Turn fans ON signal from ZoneHVAC component
+		Optional_bool_const ZoneCompTurnFansOff, // Turn Fans OFF signal from ZoneHVAC component
+		Optional< Real64 const > PressureRise // Pressure difference to use for DeltaPress
 	);
 
 public: //methods
@@ -100,7 +107,9 @@ public: //methods
 
 private: //methods
 	void
-	init();
+	init(
+		bool const firstHVACIteration
+	);
 
 	void
 	set_size();
@@ -178,6 +187,11 @@ private: // data
 	Real64 outletAirHumRat;
 	Real64 inletAirEnthalpy;
 	Real64 outletAirEnthalpy;
+	bool localTurnFansOn;
+	bool localTurnFansOff;
+	bool localEnvrnFlag;
+	bool localSizingFlag; //initialize to true
+
 	//report variables
 	Real64 fanPower; // Power of the Fan being Simulated [kW]
 	Real64 fanEnergy; // Fan energy in [kJ]
@@ -196,23 +210,15 @@ private: // data
 
 	bool faultyFilterFlag; // Indicate whether there is a fouling air filter corresponding to the fan
 	int faultyFilterIndex;  // Index of the fouling air filter corresponding to the fan
-
-
-
 	// Mass Flow Rate Control Variables
 	Real64 massFlowRateMaxAvail;
 	Real64 massFlowRateMinAvail;
 	Real64 rhoAirStdInit;
-
-//	int NVPerfNum;
-//	int FanPowerRatAtSpeedRatCurveIndex;
-//	int FanEffRatioCurveIndex;
-
 	bool oneTimePowerCurveCheck; // one time flag used for error message
-//	bool OneTimeEffRatioCheck; // one time flag used for error message
 
-}; //class FanObject 
+}; //class HVACFan 
 
+extern std::vector < std::unique_ptr <HVACFan> > fanObjs;
 
 } // Fan namespace
 

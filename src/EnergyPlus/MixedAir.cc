@@ -619,7 +619,7 @@ namespace MixedAir {
 				CompIndex = FanModel::getFanObjectVectorIndex( CompName ) + 1;
 			}
 			if ( Sim ) {
-				DataHVACGlobals::fanObjs[ CompIndex - 1 ]->simulate(); // vector is 0 based, but CompIndex is 1 based so shift 
+				FanModel::fanObjs[ CompIndex - 1 ]->simulate(); // vector is 0 based, but CompIndex is 1 based so shift 
 			}
 			//cpw22Aug2010 Add Fan:ComponentModel (new num=18)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'
@@ -1133,8 +1133,8 @@ namespace MixedAir {
 				} else if (  SELECT_CASE_var == "FAN:SYSTEMMODEL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_Simple_Object;
 					// construct fan object
-					DataHVACGlobals::fanObjs.emplace_back( std::make_unique < FanModel::Fan > ( OutsideAirSys( OASysNum ).ComponentName( CompNum ) ) );
-					OutsideAirSys( OASysNum ).ComponentIndex( CompNum )  = DataHVACGlobals::fanObjs.size();
+					FanModel::fanObjs.emplace_back( std::make_unique < FanModel::HVACFan > ( OutsideAirSys( OASysNum ).ComponentName( CompNum ) ) );
+					OutsideAirSys( OASysNum ).ComponentIndex( CompNum )  = FanModel::fanObjs.size();
 					//cpw22Aug2010 Add Fan:ComponentModel (new)
 				} else if ( SELECT_CASE_var == "FAN:COMPONENTMODEL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_ComponentModel;
