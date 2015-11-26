@@ -1,5 +1,5 @@
-#ifndef FanObject_hh_INCLUDED
-#define FanObject_hh_INCLUDED
+#ifndef HVACFan_hh_INCLUDED
+#define HVACFan_hh_INCLUDED
 
 // C++ Headers
 #include <string>
@@ -17,7 +17,7 @@
 
 namespace EnergyPlus {
 
-namespace FanModel {
+namespace HVACFan {
 
 
 
@@ -26,30 +26,30 @@ namespace FanModel {
 		std::string const objectName
 	);
 
-class HVACFan
+class FanSystem
 {
 
 private: // Creation
 	// Default Constructor
-	HVACFan() :
+	FanSystem() :
 	name( "")
 	{}
 
 	// Copy Constructor
-	HVACFan( HVACFan const & ) = default;
+	FanSystem( FanSystem const & ) = default;
 
 	// Move Constructor
 #if !defined(_MSC_VER) || defined(__INTEL_COMPILER) || (_MSC_VER>=1900)
-	HVACFan( HVACFan && ) = default;
+	FanSystem( FanSystem && ) = default;
 #endif
 
 public: // Methods
 	// Destructor
-	~HVACFan()
+	~FanSystem()
 	{}
 
 	// Constructor
-	HVACFan(
+	FanSystem(
 		std::string const objectName
 	);
 
@@ -214,11 +214,11 @@ private: // data
 	Real64 rhoAirStdInit;
 	bool oneTimePowerCurveCheck; // one time flag used for error message
 
-}; //class HVACFan 
+}; //class FanSystem 
 
-extern std::vector < std::unique_ptr <HVACFan> > fanObjs;
+extern std::vector < std::unique_ptr <FanSystem> > fanObjs;
 
 } // Fan namespace
 
 } // EnergyPlus namespace
-#endif //FanObject_hh_INCLUDED_hh_INCLUDED
+#endif //HVACFan_hh_INCLUDED_hh_INCLUDED

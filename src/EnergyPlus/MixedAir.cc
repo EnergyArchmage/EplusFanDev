@@ -29,6 +29,7 @@
 #include <EMSManager.hh>
 #include <EvaporativeCoolers.hh>
 #include <Fans.hh>
+#include <HVACFan.hh>
 #include <FaultsManager.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -616,10 +617,10 @@ namespace MixedAir {
 
 		} else if ( SELECT_CASE_var == Fan_Simple_Object) { // 'Fan:SystemModel'
 			if ( CompIndex == 0 ) {// 0 means has not been filled because of 1-based arrays in old fortran
-				CompIndex = FanModel::getFanObjectVectorIndex( CompName ) + 1;
+				CompIndex = HVACFan::getFanObjectVectorIndex( CompName ) + 1;
 			}
 			if ( Sim ) {
-				FanModel::fanObjs[ CompIndex - 1 ]->simulate(_,_,_,_); // vector is 0 based, but CompIndex is 1 based so shift 
+				HVACFan::fanObjs[ CompIndex - 1 ]->simulate(_,_,_,_); // vector is 0 based, but CompIndex is 1 based so shift 
 			}
 			//cpw22Aug2010 Add Fan:ComponentModel (new num=18)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'
@@ -1133,8 +1134,8 @@ namespace MixedAir {
 				} else if (  SELECT_CASE_var == "FAN:SYSTEMMODEL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_Simple_Object;
 					// construct fan object
-					FanModel::fanObjs.emplace_back( std::make_unique < FanModel::HVACFan > ( OutsideAirSys( OASysNum ).ComponentName( CompNum ) ) );
-					OutsideAirSys( OASysNum ).ComponentIndex( CompNum )  = FanModel::fanObjs.size();
+					HVACFan::fanObjs.emplace_back( std::make_unique < HVACFan::FanSystem> ( OutsideAirSys( OASysNum ).ComponentName( CompNum ) ) );
+					OutsideAirSys( OASysNum ).ComponentIndex( CompNum )  = HVACFan::fanObjs.size();
 					//cpw22Aug2010 Add Fan:ComponentModel (new)
 				} else if ( SELECT_CASE_var == "FAN:COMPONENTMODEL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_ComponentModel;

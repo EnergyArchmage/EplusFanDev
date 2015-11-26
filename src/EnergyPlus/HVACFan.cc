@@ -1,6 +1,6 @@
 
 // EnergyPlus Headers
-#include <FanObject.hh>
+#include <HVACFan.hh>
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
@@ -22,9 +22,9 @@
 
 namespace EnergyPlus {
 
-namespace FanModel {
+namespace HVACFan {
 
-	std::vector < std::unique_ptr <HVACFan> > fanObjs;
+	std::vector < std::unique_ptr <FanSystem> > fanObjs;
 
 	int
 	getFanObjectVectorIndex(  // lookup vector index for fan object name in object array DataHVACGlobals::fanObjs
@@ -48,7 +48,7 @@ namespace FanModel {
 	}
 
 	void
-	HVACFan::simulate(
+	FanSystem::simulate(
 //		bool const firstHVACIteration,
 		Optional< Real64 const > flowFraction,
 		Optional_bool_const zoneCompTurnFansOn, // Turn fans ON signal from ZoneHVAC component
@@ -83,7 +83,7 @@ namespace FanModel {
 	}
 
 	void
-	HVACFan::init()
+	FanSystem::init()
 	{ 
 	
 		if ( ! DataGlobals::SysSizingCalc && this->localSizingFlag ) {
@@ -138,7 +138,7 @@ namespace FanModel {
 	}
 
 	void
-	HVACFan::set_size()
+	FanSystem::set_size()
 	{
 		std::string const routineName = "HVACFan::set_size ";
 		if ( this->designAirVolFlowRateWasAutosized ) {
@@ -178,7 +178,7 @@ namespace FanModel {
 
 	}
 
-	HVACFan::HVACFan( // constructor
+	FanSystem::FanSystem( // constructor
 		std::string const objectName
 	)
 	{
@@ -332,6 +332,6 @@ namespace FanModel {
 	}
 
 
-} //FanModel namespace
+} //HVACFan namespace
 
 } // EnergyPlus namespace
