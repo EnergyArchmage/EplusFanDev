@@ -619,7 +619,7 @@ namespace MixedAir {
 				CompIndex = FanModel::getFanObjectVectorIndex( CompName ) + 1;
 			}
 			if ( Sim ) {
-				FanModel::fanObjs[ CompIndex - 1 ]->simulate(); // vector is 0 based, but CompIndex is 1 based so shift 
+				FanModel::fanObjs[ CompIndex - 1 ]->simulate(_,_,_,_); // vector is 0 based, but CompIndex is 1 based so shift 
 			}
 			//cpw22Aug2010 Add Fan:ComponentModel (new num=18)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'

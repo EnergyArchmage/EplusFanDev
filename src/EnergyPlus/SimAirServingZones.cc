@@ -2837,7 +2837,7 @@ namespace SimAirServingZones {
 			if ( CompIndex == 0 ) { // 0 means has not been filled because of 1-based arrays in old fortran
 				CompIndex = FanModel::getFanObjectVectorIndex( CompName ) + 1;
 			}
-			FanModel::fanObjs[ CompIndex - 1 ]->simulate( FirstHVACIteration,_,_,_,_ ); // vector is 0 based, but CompIndex is 1 based so shift 
+			FanModel::fanObjs[ CompIndex - 1 ]->simulate( _,_,_,_ ); // vector is 0 based, but CompIndex is 1 based so shift 
 
 			// cpw22Aug2010 Add Fan:ComponentModel (new)
 		} else if ( SELECT_CASE_var == Fan_ComponentModel ) { // 'Fan:ComponentModel'

@@ -55,11 +55,11 @@ public: // Methods
 
 	void
 	simulate(
-		bool const FirstHVACIteration,
-		Optional< Real64 const > SpeedRatio,
-		Optional_bool_const ZoneCompTurnFansOn, // Turn fans ON signal from ZoneHVAC component
-		Optional_bool_const ZoneCompTurnFansOff, // Turn Fans OFF signal from ZoneHVAC component
-		Optional< Real64 const > PressureRise // Pressure difference to use for DeltaPress
+//		bool const firstHVACIteration,
+		Optional< Real64 const > flowFraction,
+		Optional_bool_const zoneCompTurnFansOn, // Turn fans ON signal from ZoneHVAC component
+		Optional_bool_const zoneCompTurnFansOff, // Turn Fans OFF signal from ZoneHVAC component
+		Optional< Real64 const > pressureRise // Pressure difference to use for DeltaPress
 	);
 
 public: //methods
@@ -107,9 +107,7 @@ public: //methods
 
 private: //methods
 	void
-	init(
-		bool const firstHVACIteration
-	);
+	init();
 
 	void
 	set_size();
@@ -189,7 +187,7 @@ private: // data
 	Real64 outletAirEnthalpy;
 	bool localTurnFansOn;
 	bool localTurnFansOff;
-	bool localEnvrnFlag;
+	bool localEnvrnFlag; // initialize to true
 	bool localSizingFlag; //initialize to true
 
 	//report variables

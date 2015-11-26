@@ -16,6 +16,9 @@
 #include <General.hh>
 #include <EMSManager.hh>
 #include <ObjexxFCL/Optional.hh>
+#include <DataAirLoop.hh>
+#include <DataEnvironment.hh>
+#include <ReportSizingManager.hh>
 
 namespace EnergyPlus {
 
@@ -46,8 +49,8 @@ namespace FanModel {
 
 	void
 	HVACFan::simulate(
-		bool const firstHVACIteration,
-		Optional< Real64 const > speedRatio,
+//		bool const firstHVACIteration,
+		Optional< Real64 const > flowFraction,
 		Optional_bool_const zoneCompTurnFansOn, // Turn fans ON signal from ZoneHVAC component
 		Optional_bool_const zoneCompTurnFansOff, // Turn Fans OFF signal from ZoneHVAC component
 		Optional< Real64 const > pressureRise // Pressure difference to use for DeltaPress
@@ -57,7 +60,7 @@ namespace FanModel {
 		this->localTurnFansOn = false;
 		this->localTurnFansOff = false;
 
-		this->init( firstHVACIteration );
+		this->init( );
 
 		if ( present( zoneCompTurnFansOn ) && present( zoneCompTurnFansOff ) ) {
 			// Set module-level logic flags equal to ZoneCompTurnFansOn and ZoneCompTurnFansOff values passed into this routine
@@ -80,11 +83,99 @@ namespace FanModel {
 	}
 
 	void
-	init(
-		bool const firstHVACIteration
-	)
-	{
+	HVACFan::init()
+	{ 
 	
+		if ( ! DataGlobals::SysSizingCalc && this->localSizingFlag ) {
+			this->set_size();
+			this->localSizingFlag = false;
+			if ( DataSizing::CurSysNum > 0 ) {
+				DataAirLoop::AirLoopControlInfo( DataSizing::CurSysNum ).CyclingFan = true;
+			}
+		}
+
+		if ( DataGlobals::BeginEnvrnFlag && this->localEnvrnFlag ) {
+			this->rhoAirStdInit = DataEnvironment::StdRhoAir;
+			this->maxAirMassFlowRate = this->designAirVolFlowRate * this->rhoAirStdInit;
+			this->minAirFlowRate = this->designAirVolFlowRate * this->minPowerFlowFrac;
+			this->minAirMassFlowRate = this->minAirFlowRate * this->rhoAirStdInit;
+
+//			if ( Fan( FanNum ).NVPerfNum > 0 ) {
+//				NightVentPerf( Fan( FanNum ).NVPerfNum ).MaxAirMassFlowRate = NightVentPerf( Fan( FanNum ).NVPerfNum ).MaxAirFlowRate * Fan( FanNum ).RhoAirStdInit;
+//			}
+
+			//Init the Node Control variables
+			DataLoopNode::Node( this->outletNodeNum ).MassFlowRateMax = this->maxAirMassFlowRate;
+			DataLoopNode::Node( this->outletNodeNum  ).MassFlowRateMin =this->minAirMassFlowRate;
+
+			//Initialize all report variables to a known state at beginning of simulation
+			this->fanPower = 0.0;
+			this->deltaTemp = 0.0;
+			this->fanEnergy = 0.0;
+			for ( auto loop = 0; loop < this->numSpeeds; ++loop ) {
+				this->fanRunTimeFractionSpeed[ loop ] = 0.0;
+			}
+			this->localEnvrnFlag =  false;
+		}
+
+		if ( ! DataGlobals::BeginEnvrnFlag ) {
+			this->localEnvrnFlag = true;
+		}
+
+		this->massFlowRateMaxAvail = min( DataLoopNode::Node( this->outletNodeNum ).MassFlowRateMax, DataLoopNode::Node( this->inletNodeNum ).MassFlowRateMaxAvail );
+		this->massFlowRateMinAvail = min( max( DataLoopNode::Node( this->outletNodeNum ).MassFlowRateMin, DataLoopNode::Node( this->inletNodeNum ).MassFlowRateMinAvail ), DataLoopNode::Node( this->inletNodeNum ).MassFlowRateMaxAvail );
+
+		// Load the node data in this section for the component simulation
+		//First need to make sure that the MassFlowRate is between the max and min avail.
+		this->inletAirMassFlowRate = min( DataLoopNode::Node( this->inletNodeNum ).MassFlowRate, this->massFlowRateMaxAvail );
+		this->inletAirMassFlowRate = max( this->inletAirMassFlowRate, this->massFlowRateMinAvail );
+
+		//Then set the other conditions
+		this->inletAirTemp     = DataLoopNode::Node( this->inletNodeNum ).Temp;
+		this->inletAirHumRat   = DataLoopNode::Node( this->inletNodeNum ).HumRat;
+		this->inletAirEnthalpy = DataLoopNode::Node( this->inletNodeNum ).Enthalpy;
+
+	}
+
+	void
+	HVACFan::set_size()
+	{
+		std::string const routineName = "HVACFan::set_size ";
+		if ( this->designAirVolFlowRateWasAutosized ) {
+			Real64 tempFlow = this->designAirVolFlowRate;
+			bool bPRINT = true;
+			DataSizing::DataAutosizable = true;
+			DataSizing::DataEMSOverrideON = this->maxAirFlowRateEMSOverrideOn;
+			DataSizing::DataEMSOverride   = this->maxAirFlowRateEMSOverrideValue;
+			ReportSizingManager::RequestSizing(this->fanType, this->name, DataHVACGlobals::SystemAirflowSizing, "Design Maximum Air Flow Rate [m3/s]", tempFlow, bPRINT, routineName );
+			this->designAirVolFlowRate    = tempFlow;
+			DataSizing::DataAutosizable   = true;
+			DataSizing::DataEMSOverrideON = false;
+			DataSizing::DataEMSOverride   = 0.0;
+		}
+
+		if ( this->designElecPowerWasAutosized ) {
+		
+		switch ( this->powerSizingMethod )
+		{
+		
+		case powerPerFlow: {
+		
+			break;
+		}
+		case powerPerFlowPerPressure: {
+		
+			break;
+		}
+		case totalEfficiencyAndPressure: {
+		
+			break;
+		}
+		
+		} // end switch
+		
+		}
+
 	}
 
 	HVACFan::HVACFan( // constructor
