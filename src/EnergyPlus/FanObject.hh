@@ -129,6 +129,11 @@ private: // data
 		totalEfficiencyAndPressure
 	
 	};
+	enum thermalLossDestinationEnum {
+		heatLossNotDetermined,
+		zoneGains,
+		lostToOutside
+	};
 	//input data
 	std::string name; // user identifier
 	std::string fanType; // Type of Fan ie. Simple, Vane axial, Centrifugal, etc.
@@ -150,37 +155,45 @@ private: // data
 	Real64 elecPowerPerFlowRatePerPressure; // scaling factor for powerPerFlowPerPressure
 	Real64 fanTotalEff; // Fan total system efficiency (fan*belt*motor*VFD)
 	int powerModFuncFlowFractionCurveIndex; // pointer to performance curve or table
-
+	Real64 nightVentPressureDelta; // fan pressure rise during night ventilation mode
+	Real64 nightVentFlowFraction; // fan flow fraction during night ventilation mode
+	int zoneNum; // zone index for motor heat losses as internal gains
+	Real64 zoneRadFract; // thermal radiation split for motor losses
+	thermalLossDestinationEnum heatLossesDestination; //enum for where motor loss go
+	std::string endUseSubcategoryName;
+	int numSpeeds; // input for how many speed levels for discrete fan
+	std::vector < Real64 > flowFractionSpeed; //array of flow fractions for speed levels
+	std::vector < Real64 > powerFractionSpeed; // array of power fractions for speed levels
+	//calculation variables
 	Real64 inletAirMassFlowRate; // MassFlow through the Fan being Simulated [kg/Sec]
 	Real64 outletAirMassFlowRate;
-
-	bool maxAirFlowRateEMSOverrideOn; // if true, EMS wants to override fan size for Max Volume Flow Rate
-	Real64 maxAirFlowRateEMSOverrideValue; // EMS value to use for override of  Max Volume Flow Rate
 	Real64 minAirFlowRate; // Min Specified Volume Flow Rate of Fan [m3/sec]
 	Real64 maxAirMassFlowRate; // Max flow rate of fan in kg/sec
 	Real64 minAirMassFlowRate; // Min flow rate of fan in kg/sec
 //	int fanMinAirFracMethod; // parameter for what method is used for min flow fraction
-
 //	Real64 fanFixedMin; // Absolute minimum fan air flow [m3/s]
-	bool eMSMaxMassFlowOverrideOn; // if true, then EMS is calling to override mass flow
-	Real64 eMSAirMassFlowValue; // value EMS is directing to use [kg/s]
 	Real64 inletAirTemp;
 	Real64 outletAirTemp;
 	Real64 inletAirHumRat;
 	Real64 outletAirHumRat;
 	Real64 inletAirEnthalpy;
 	Real64 outletAirEnthalpy;
+	//report variables
 	Real64 fanPower; // Power of the Fan being Simulated [kW]
 	Real64 fanEnergy; // Fan energy in [kJ]
-	Real64 fanRuntimeFraction; // Fraction of the timestep that the fan operates
+//	Real64 fanRuntimeFraction; // Fraction of the timestep that the fan operates
 	Real64 deltaTemp; // Temp Rise across the Fan [C]
-
+	std::vector < Real64 > fanRunTimeFractionSpeed;
+	//EMS related variables
+	bool maxAirFlowRateEMSOverrideOn; // if true, EMS wants to override fan size for Max Volume Flow Rate
+	Real64 maxAirFlowRateEMSOverrideValue; // EMS value to use for override of  Max Volume Flow Rate
 	bool eMSFanPressureOverrideOn; // if true, then EMS is calling to override
 	Real64 eMSFanPressureValue; // EMS value for Delta Pressure Across the Fan [Pa]
-
-
 	bool eMSFanEffOverrideOn; // if true, then EMS is calling to override
 	Real64 eMSFanEffValue; // EMS value for total efficiency of the Fan, fraction on 0..1
+	bool eMSMaxMassFlowOverrideOn; // if true, then EMS is calling to override mass flow
+	Real64 eMSAirMassFlowValue; // value EMS is directing to use [kg/s]
+
 	bool faultyFilterFlag; // Indicate whether there is a fouling air filter corresponding to the fan
 	int faultyFilterIndex;  // Index of the fouling air filter corresponding to the fan
 
@@ -194,7 +207,7 @@ private: // data
 //	int NVPerfNum;
 //	int FanPowerRatAtSpeedRatCurveIndex;
 //	int FanEffRatioCurveIndex;
-	std::string endUseSubcategoryName;
+
 	bool oneTimePowerCurveCheck; // one time flag used for error message
 //	bool OneTimeEffRatioCheck; // one time flag used for error message
 

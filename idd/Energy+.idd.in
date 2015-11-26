@@ -40575,7 +40575,7 @@ ZoneHVAC:EquipmentConnections,
 \group Fans
 !*****************AIR LOOP COMPONENTS*********************
 Fan:SystemModel,
-       \memo Versatile simple fan that can be used in variable air volume, constant volume, or on-off cycling applications.
+       \memo Versatile simple fan that can be used in variable air volume, constant volume, on-off cycling, two-speed or multi-speed applications.
        \memo Performance at different flow rates, or speed levels, is determined using separate performance curve or table
        \memo or prescribed power fractions at discrete speed levels for two-speed or multi-speed fans.
        \min-fields 14
