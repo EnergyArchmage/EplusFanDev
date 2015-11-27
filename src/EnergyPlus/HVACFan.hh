@@ -169,9 +169,12 @@ private: // data
 	thermalLossDestinationEnum heatLossesDestination; //enum for where motor loss go
 	std::string endUseSubcategoryName;
 	int numSpeeds; // input for how many speed levels for discrete fan
-	std::vector < Real64 > flowFractionSpeed; //array of flow fractions for speed levels
-	std::vector < Real64 > powerFractionSpeed; // array of power fractions for speed levels
+	std::vector < Real64 > flowFractionAtSpeed; //array of flow fractions for speed levels
+	std::vector < Real64 > powerFractionAtSpeed; // array of power fractions for speed levels
+	std::vector < bool > powerFractionInputAtSpeed;
 	//calculation variables
+	std::vector < Real64 > massFlowAtSpeed;
+	std::vector < Real64 > totEfficAtSpeed;
 	Real64 inletAirMassFlowRate; // MassFlow through the Fan being Simulated [kg/Sec]
 	Real64 outletAirMassFlowRate;
 	Real64 minAirFlowRate; // Min Specified Volume Flow Rate of Fan [m3/sec]
@@ -195,7 +198,7 @@ private: // data
 	Real64 fanEnergy; // Fan energy in [kJ]
 //	Real64 fanRuntimeFraction; // Fraction of the timestep that the fan operates
 	Real64 deltaTemp; // Temp Rise across the Fan [C]
-	std::vector < Real64 > fanRunTimeFractionSpeed;
+	std::vector < Real64 > fanRunTimeFractionAtSpeed;
 	//EMS related variables
 	bool maxAirFlowRateEMSOverrideOn; // if true, EMS wants to override fan size for Max Volume Flow Rate
 	Real64 maxAirFlowRateEMSOverrideValue; // EMS value to use for override of  Max Volume Flow Rate

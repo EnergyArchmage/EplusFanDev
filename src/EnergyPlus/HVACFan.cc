@@ -19,6 +19,8 @@
 #include <DataAirLoop.hh>
 #include <DataEnvironment.hh>
 #include <ReportSizingManager.hh>
+#include <OutputReportPredefined.hh>
+#include <ReportSizingManager.hh>
 
 namespace EnergyPlus {
 
@@ -113,7 +115,7 @@ namespace HVACFan {
 			this->deltaTemp = 0.0;
 			this->fanEnergy = 0.0;
 			for ( auto loop = 0; loop < this->numSpeeds; ++loop ) {
-				this->fanRunTimeFractionSpeed[ loop ] = 0.0;
+				this->fanRunTimeFractionAtSpeed[ loop ] = 0.0;
 			}
 			this->localEnvrnFlag =  false;
 		}
@@ -156,25 +158,58 @@ namespace HVACFan {
 
 		if ( this->designElecPowerWasAutosized ) {
 		
-		switch ( this->powerSizingMethod )
-		{
+			switch ( this->powerSizingMethod )
+			{
 		
-		case powerPerFlow: {
+			case powerPerFlow: {
+				this->designElecPower = this->designAirVolFlowRate * this->elecPowerPerFlowRate;
+				break;
+			}
+			case powerPerFlowPerPressure: {
+				this->designElecPower = this->designAirVolFlowRate * this->deltaPress * this->elecPowerPerFlowRatePerPressure;
+				break;
+			}
+			case totalEfficiencyAndPressure: {
+				this->designElecPower = this->designAirVolFlowRate * this->deltaPress / this->fanTotalEff;
+				break;
+			}
 		
-			break;
+			} // end switch
+
+			//report design power
+			ReportSizingManager::ReportSizingOutput( this->fanType, this->name, "Design Electric Power Consumption [W]", this->designElecPower );
+		
+		} // end if power was autosized
+
+		//calculate total fan system efficiency at design
+		this->fanTotalEff = this->designAirVolFlowRate * this->deltaPress  / this->designElecPower;
+
+		if (this->numSpeeds > 1 ) { // set up values at speeds
+			this->massFlowAtSpeed.resize( this->numSpeeds, 0.0 );
+			this->totEfficAtSpeed.resize( this->numSpeeds, 0.0 );
+			for ( auto loop=0; loop < this->numSpeeds; ++loop ) {
+				this->massFlowAtSpeed[ loop ] = this->maxAirMassFlowRate * this->flowFractionAtSpeed[ loop ];
+				if ( this->powerFractionInputAtSpeed[ loop ] ) { // use speed power fraction
+					this->totEfficAtSpeed[ loop ] = this->flowFractionAtSpeed[ loop ] * this->designAirVolFlowRate * this->deltaPress  / ( this->designElecPower * powerFractionAtSpeed[ loop ] );
+				} else { // use power curve
+					this->totEfficAtSpeed[ loop ] = this->flowFractionAtSpeed[ loop ] * this->designAirVolFlowRate * this->deltaPress  / ( this->designElecPower * CurveManager::CurveValue( this->powerModFuncFlowFractionCurveIndex, this->flowFractionAtSpeed[ loop ] ) );
+				}
+				
+			}
 		}
-		case powerPerFlowPerPressure: {
-		
-			break;
+
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanType, this->name, this->fanType );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanTotEff, this->name, this->fanTotalEff );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanDeltaP, this->name, this->deltaPress );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanVolFlow, this->name, this->designAirVolFlowRate );
+
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanPwr, this->name, this->designElecPower );
+		if ( this->designAirVolFlowRate != 0.0 ) {
+			OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanPwrPerFlow, this->name, this->designElecPower / this->designAirVolFlowRate );
 		}
-		case totalEfficiencyAndPressure: {
-		
-			break;
-		}
-		
-		} // end switch
-		
-		}
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanMotorIn, this->name, this->motorInAirFrac );
+		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanEndUse, this->name, this->endUseSubcategoryName );
+
 
 	}
 
@@ -285,16 +320,22 @@ namespace HVACFan {
 		} else {
 			this->numSpeeds =  1;
 		}
-		this->fanRunTimeFractionSpeed.resize(this->numSpeeds, 0.0);
+		this->fanRunTimeFractionAtSpeed.resize( this->numSpeeds, 0.0 );
 		if ( this->speedControl == speedControlDiscrete && this->numSpeeds > 1 ) {
 			//should have field sets 
-			this->flowFractionSpeed.resize(this->numSpeeds, 0.0);
-			this->powerFractionSpeed.resize(this->numSpeeds, 0.0);
-
+			this->flowFractionAtSpeed.resize( this->numSpeeds, 0.0 );
+			this->powerFractionAtSpeed.resize( this->numSpeeds, 0.0 );
+			this->powerFractionInputAtSpeed.resize( this->numSpeeds, false );
 			if ( this->numSpeeds == (( numNums - 13 ) / 2 ) || this->numSpeeds == (( numNums + 1 - 13 ) / 2 ) ) {
 				for ( auto loopSet = 0 ; loopSet< this->numSpeeds; ++loopSet ) {
-					this->flowFractionSpeed[ loopSet ]  = DataIPShortCuts::rNumericArgs( 13 + loopSet * 2 + 1 );
-					this->powerFractionSpeed[ loopSet ] = DataIPShortCuts::rNumericArgs( 13 + loopSet * 2 + 2 );
+					this->flowFractionAtSpeed[ loopSet ]  = DataIPShortCuts::rNumericArgs( 13 + loopSet * 2 + 1 );
+					if ( ! DataIPShortCuts::lNumericFieldBlanks( 13 + loopSet * 2 + 2  )  ) {
+						this->powerFractionAtSpeed[ loopSet ] = DataIPShortCuts::rNumericArgs( 13 + loopSet * 2 + 2 );
+						this->powerFractionInputAtSpeed[ loopSet ] = true;
+					} else {
+						this->powerFractionInputAtSpeed[ loopSet ] = false;
+					}
+
 				}
 			} else {
 				// field set input does not match number of speeds, throw warning
@@ -302,6 +343,23 @@ namespace HVACFan {
 				ShowContinueError( "Fan with Discrete speed control does not have input for speed data that matches the number of speeds.");
 				errorsFound = true;
 			}
+		}
+
+		// check if power curve present when any speeds have no power fraction 
+		if ( this->speedControl == speedControlDiscrete && this->numSpeeds > 1 && this->powerModFuncFlowFractionCurveIndex == 0 ) {
+			bool foundMissingPowerFraction = false;
+			for ( auto loop = 0 ; loop< this->numSpeeds; ++loop ) {
+				if ( ! this->powerFractionInputAtSpeed[ loop ] ) {
+					foundMissingPowerFraction = true;
+				}
+			}
+			if ( foundMissingPowerFraction ) {
+				// field set input does not match number of speeds, throw warning
+				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
+				ShowContinueError( "Fan with Discrete speed control does not have input for power fraction at all speed levels and does not have a power curve.");
+				errorsFound = true;
+			}
+
 		}
 
 		if ( errorsFound ) {
@@ -312,10 +370,10 @@ namespace HVACFan {
 		SetupOutputVariable( "Fan Rise in Air Temperature [deltaC]", this->deltaTemp, "System", "Average", this->name );
 		SetupOutputVariable( "Fan Electric Energy [J]", this->fanEnergy, "System", "Sum", this->name, _, "Electric", "Fans", this->endUseSubcategoryName, "System" );
 		if ( this->speedControl == speedControlDiscrete && this->numSpeeds == 1 ) {
-			SetupOutputVariable( "Fan Runtime Fraction []", this->fanRunTimeFractionSpeed[ 0 ], "System", "Average", this->name );
+			SetupOutputVariable( "Fan Runtime Fraction []", this->fanRunTimeFractionAtSpeed[ 0 ], "System", "Average", this->name );
 		} else if ( this->speedControl == speedControlDiscrete && this->numSpeeds > 1 ) {
 			for (auto speedLoop = 0; speedLoop < this->numSpeeds; ++speedLoop) {
-				SetupOutputVariable( "Fan Runtime Fraction Speed " + General::TrimSigDigits( speedLoop + 1 ) + " []", this->fanRunTimeFractionSpeed[ speedLoop ], "System", "Average", this->name );
+				SetupOutputVariable( "Fan Runtime Fraction Speed " + General::TrimSigDigits( speedLoop + 1 ) + " []", this->fanRunTimeFractionAtSpeed[ speedLoop ], "System", "Average", this->name );
 			}
 		}
 
