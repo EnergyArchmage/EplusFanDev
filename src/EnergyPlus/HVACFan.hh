@@ -66,35 +66,24 @@ public: // Methods
 	getFanName() const;
 
 	Real64
-	getFanVolFlow() const;
-
-	Real64
 	getFanPower() const;
 
 	Real64
-	getFanDesignVolumeFlowRate(
-		bool & errorsFound
-	) const;
+	getFanDesignVolumeFlowRate() const;
 
 	int
-	getFanInletNode(
-		bool & errorsFound
-	) const;
+	getFanInletNode() const;
 
 	int
-	getFanOutletNode(
-		bool & errorsFound
-	) const;
+	getFanOutletNode() const;
 
 	int
-	getFanAvailSchIndex(
-		bool & errorsFound
-	) const;
+	getFanAvailSchIndex() const;
 
 	int
 	getFanPowerCurveIndex() const;
 
-	int
+	Real64
 	getFanDesignTemperatureRise() const;
 
 	Real64 
@@ -192,7 +181,7 @@ private: // data
 	bool objTurnFansOn;
 	bool objTurnFansOff;
 	bool objEnvrnFlag; // initialize to true
-	bool objSizingFlag; //initialize to true
+	bool objSizingFlag; //initialize to true, set to false after sizing routine
 
 	//report variables
 	Real64 fanPower; // Power of the Fan being Simulated [kW]

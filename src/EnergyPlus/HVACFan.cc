@@ -23,6 +23,7 @@
 #include <ReportSizingManager.hh>
 #include <Psychrometrics.hh>
 #include <DataContaminantBalance.hh>
+#include <DataPrecisionGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -220,7 +221,7 @@ namespace HVACFan {
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanMotorIn, this->name, this->motorInAirFrac );
 		OutputReportPredefined::PreDefTableEntry( OutputReportPredefined::pdchFanEndUse, this->name, this->endUseSubcategoryName );
 
-
+		this->objSizingFlag = false;
 	}
 
 	FanSystem::FanSystem( // constructor
@@ -550,6 +551,73 @@ namespace HVACFan {
 		this->deltaTemp = this->outletAirTemp - this->inletAirTemp;
 	}
 
+	std::string
+	FanSystem::getFanName() const
+	{
+		return this->name;
+	}
+
+	Real64
+	FanSystem::getFanDesignVolumeFlowRate() const
+	{
+		return this->designAirVolFlowRate;
+	}
+
+	int
+	FanSystem::getFanInletNode() const
+	{
+		return this->inletNodeNum;
+	}
+
+	int
+	FanSystem::getFanOutletNode() const
+	{
+		return this->outletNodeNum;
+	}
+
+	int
+	FanSystem::getFanAvailSchIndex() const
+	{
+		return this->availSchedIndex;
+	}
+
+	int
+	FanSystem::getFanPowerCurveIndex() const
+	{
+		return this->powerModFuncFlowFractionCurveIndex;
+	}
+
+	Real64
+	FanSystem::getFanDesignTemperatureRise() const
+	{
+		if ( ! this->objSizingFlag ) {
+			Real64 cpAir = Psychrometrics::PsyCpAirFnWTdb( DataPrecisionGlobals::constant_zero, DataPrecisionGlobals::constant_twenty );
+			Real64 designDeltaT = ( this->deltaPress / ( this->rhoAirStdInit * cpAir * this->fanTotalEff ) ) * ( this->motorEff + this->motorInAirFrac * ( 1.0 - this->motorEff ) );
+			return designDeltaT;
+		} else {
+			//TODO throw warning, exception, call sizing?
+			ShowWarningError("FanSystem::getFanDesignTemperatureRise called before fan sizing completed ");
+			return 0.0;
+		}
+
+
+	}
+
+	Real64 
+	FanSystem::getFanDesignHeatGain(
+		Real64 const FanVolFlow // fan volume flow rate [m3/s]
+	) const
+	{
+		if ( ! this->objSizingFlag ) {
+			Real64 fanPowerTot = ( FanVolFlow * this->deltaPress ) / this->fanTotalEff ;
+			Real64 designHeatGain = this->motorEff * fanPowerTot + ( fanPowerTot - this->motorEff * fanPowerTot ) * this->motorInAirFrac;
+			return designHeatGain;
+		} else {
+			//TODO throw warning, exception, call sizing?
+			ShowWarningError("FanSystem::getFanDesignHeatGain called before fan sizing completed ");
+			return 0.0;
+		}
+	}
 
 } //HVACFan namespace
 
