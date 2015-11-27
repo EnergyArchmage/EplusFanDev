@@ -62,47 +62,45 @@ public: // Methods
 		Optional< Real64 const > pressureRise // Pressure difference to use for DeltaPress
 	);
 
-public: //methods
-
 	std::string
-	getFanName();
+	getFanName() const;
 
 	Real64
-	getFanVolFlow();
+	getFanVolFlow() const;
 
 	Real64
-	getFanPower();
+	getFanPower() const;
 
 	Real64
 	getFanDesignVolumeFlowRate(
 		bool & errorsFound
-	);
+	) const;
 
 	int
 	getFanInletNode(
 		bool & errorsFound
-	);
+	) const;
 
 	int
 	getFanOutletNode(
 		bool & errorsFound
-	);
+	) const;
 
 	int
 	getFanAvailSchIndex(
 		bool & errorsFound
-	);
+	) const;
 
 	int
-	getFanPowerCurveIndex();
+	getFanPowerCurveIndex() const;
 
 	int
-	getFanDesignTemperatureRise();
+	getFanDesignTemperatureRise() const;
 
 	Real64 
 	getFanDesignHeatGain(
 		Real64 const FanVolFlow // fan volume flow rate [m3/s]
-	);
+	) const;
 
 
 private: //methods
@@ -113,7 +111,10 @@ private: //methods
 	set_size();
 
 	void
-	calcSimpleSystemFan();
+	calcSimpleSystemFan(
+		Optional< Real64 const > flowFraction,
+		Optional< Real64 const > PressureRise
+	);
 
 	void
 	update() const; 
@@ -188,10 +189,10 @@ private: // data
 	Real64 outletAirHumRat;
 	Real64 inletAirEnthalpy;
 	Real64 outletAirEnthalpy;
-	bool localTurnFansOn;
-	bool localTurnFansOff;
-	bool localEnvrnFlag; // initialize to true
-	bool localSizingFlag; //initialize to true
+	bool objTurnFansOn;
+	bool objTurnFansOff;
+	bool objEnvrnFlag; // initialize to true
+	bool objSizingFlag; //initialize to true
 
 	//report variables
 	Real64 fanPower; // Power of the Fan being Simulated [kW]

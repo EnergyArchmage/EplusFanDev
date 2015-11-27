@@ -21,6 +21,8 @@
 #include <ReportSizingManager.hh>
 #include <OutputReportPredefined.hh>
 #include <ReportSizingManager.hh>
+#include <Psychrometrics.hh>
+#include <DataContaminantBalance.hh>
 
 namespace EnergyPlus {
 
@@ -55,12 +57,12 @@ namespace HVACFan {
 		Optional< Real64 const > flowFraction,
 		Optional_bool_const zoneCompTurnFansOn, // Turn fans ON signal from ZoneHVAC component
 		Optional_bool_const zoneCompTurnFansOff, // Turn Fans OFF signal from ZoneHVAC component
-		Optional< Real64 const > pressureRise // Pressure difference to use for DeltaPress
+		Optional< Real64 const > pressureRise // Pressure difference to use for DeltaPress, for rating DX coils without entire duct system
 	)
 	{
 
-		this->localTurnFansOn = false;
-		this->localTurnFansOff = false;
+		this->objTurnFansOn = false;
+		this->objTurnFansOff = false;
 
 		this->init( );
 
@@ -68,15 +70,23 @@ namespace HVACFan {
 			// Set module-level logic flags equal to ZoneCompTurnFansOn and ZoneCompTurnFansOff values passed into this routine
 			// for ZoneHVAC components with system availability managers defined.
 			// The module-level flags get used in the other subroutines (e.g., SimSimpleFan,SimVariableVolumeFan and SimOnOffFan)
-			this->localTurnFansOn = zoneCompTurnFansOn;
-			this->localTurnFansOff = zoneCompTurnFansOff;
+			this->objTurnFansOn = zoneCompTurnFansOn;
+			this->objTurnFansOff = zoneCompTurnFansOff;
 		} else {
 			// Set module-level logic flags equal to the global LocalTurnFansOn and LocalTurnFansOff variables for all other cases.
-			this->localTurnFansOn = DataHVACGlobals::TurnFansOn;
-			this->localTurnFansOff = DataHVACGlobals::TurnFansOff;
+			this->objTurnFansOn = DataHVACGlobals::TurnFansOn;
+			this->objTurnFansOff = DataHVACGlobals::TurnFansOff;
+		}
+		if ( present( pressureRise ) &&  present( flowFraction ) ) {
+			this->calcSimpleSystemFan( flowFraction, pressureRise );
+		} else if ( present( pressureRise ) && ! present( flowFraction ) ){
+			this->calcSimpleSystemFan( _, pressureRise );
+		} else if ( ! present( pressureRise ) &&  present( flowFraction ) ) {
+			this->calcSimpleSystemFan( flowFraction, _ );
+		} else {
+			this->calcSimpleSystemFan( _ , _ );
 		}
 
-		this->calcSimpleSystemFan();
 
 		this->update();
 
@@ -88,15 +98,15 @@ namespace HVACFan {
 	FanSystem::init()
 	{ 
 	
-		if ( ! DataGlobals::SysSizingCalc && this->localSizingFlag ) {
+		if ( ! DataGlobals::SysSizingCalc && this->objSizingFlag ) {
 			this->set_size();
-			this->localSizingFlag = false;
+			this->objSizingFlag = false;
 			if ( DataSizing::CurSysNum > 0 ) {
 				DataAirLoop::AirLoopControlInfo( DataSizing::CurSysNum ).CyclingFan = true;
 			}
 		}
 
-		if ( DataGlobals::BeginEnvrnFlag && this->localEnvrnFlag ) {
+		if ( DataGlobals::BeginEnvrnFlag && this->objEnvrnFlag ) {
 			this->rhoAirStdInit = DataEnvironment::StdRhoAir;
 			this->maxAirMassFlowRate = this->designAirVolFlowRate * this->rhoAirStdInit;
 			this->minAirFlowRate = this->designAirVolFlowRate * this->minPowerFlowFrac;
@@ -117,11 +127,11 @@ namespace HVACFan {
 			for ( auto loop = 0; loop < this->numSpeeds; ++loop ) {
 				this->fanRunTimeFractionAtSpeed[ loop ] = 0.0;
 			}
-			this->localEnvrnFlag =  false;
+			this->objEnvrnFlag =  false;
 		}
 
 		if ( ! DataGlobals::BeginEnvrnFlag ) {
-			this->localEnvrnFlag = true;
+			this->objEnvrnFlag = true;
 		}
 
 		this->massFlowRateMaxAvail = min( DataLoopNode::Node( this->outletNodeNum ).MassFlowRateMax, DataLoopNode::Node( this->inletNodeNum ).MassFlowRateMaxAvail );
@@ -387,6 +397,157 @@ namespace HVACFan {
 			SetupEMSActuator( "Fan", this->name , "Fan Autosized Air Flow Rate", "[m3/s]", this->maxAirFlowRateEMSOverrideOn, this->maxAirFlowRateEMSOverrideValue );
 		}
 		EMSManager::ManageEMS( DataGlobals::emsCallFromComponentGetInput );
+	}
+
+	void
+	FanSystem::calcSimpleSystemFan(
+		Optional< Real64 const > flowFraction,
+		Optional< Real64 const > pressureRise
+	)
+	{
+		Real64 localPressureRise;
+		Real64 localFlowFraction;
+		Real64 localFanTotEff;
+		Real64 localAirMassFlow;
+
+		if ( DataHVACGlobals::NightVentOn ) {
+		// assume if non-zero inputs for night data then this fan is to be used with that data
+			if ( this->nightVentPressureDelta > 0.0 ) { 
+				localPressureRise =  this->nightVentPressureDelta;
+			}
+			if ( this->nightVentFlowFraction > 0.0 ) {
+				localFlowFraction = this->nightVentFlowFraction;
+				localAirMassFlow = localFlowFraction * this->maxAirMassFlowRate;
+			}
+		} else { // not in night mode
+			if ( present( pressureRise ) ) {
+				localPressureRise = pressureRise;
+			} else {
+				localPressureRise = this->deltaPress;
+			}
+			if ( present( flowFraction ) ) {
+				localFlowFraction = flowFraction;
+				localAirMassFlow = localFlowFraction * this->maxAirMassFlowRate;
+			} else {
+				localFlowFraction = this->inletAirMassFlowRate / this->maxAirMassFlowRate;
+				localAirMassFlow  = this->inletAirMassFlowRate;
+			}
+		}
+
+// TODO Faulty fan operation
+
+
+		//EMS override MassFlow, DeltaPress, and FanEff
+		if ( this->eMSFanPressureOverrideOn ) localPressureRise = this->eMSFanPressureValue;
+		if ( this->eMSFanEffOverrideOn ) localFanTotEff = this->eMSFanEffValue;
+		if ( this->eMSMaxMassFlowOverrideOn ) {
+			localAirMassFlow = this->eMSAirMassFlowValue;
+
+		}
+
+		localAirMassFlow = min( localAirMassFlow, this->maxAirMassFlowRate );
+		localFlowFraction = localAirMassFlow / this->maxAirMassFlowRate;
+
+		if ( ( ScheduleManager::GetCurrentScheduleValue( this->availSchedIndex ) > 0.0 || this->objTurnFansOn ) && ! this->objTurnFansOff && localAirMassFlow > 0.0 ) {
+			//fan is running
+
+			switch ( this->speedControl ) {
+			
+			case speedControlDiscrete: {
+			
+				break;
+			}
+			case speedControlContinuous: {
+				Real64 localFlowFractionForPower = max( this->minPowerFlowFrac, localFlowFraction );
+				Real64 localPowerFraction = CurveManager::CurveValue( this->powerModFuncFlowFractionCurveIndex, localFlowFractionForPower );
+				this->fanPower = localPowerFraction * this->maxAirMassFlowRate * localPressureRise / ( localFanTotEff * this->rhoAirStdInit );
+				Real64 fanShaftPower = this->motorEff * this->fanPower;
+				Real64 powerLossToAir = fanShaftPower + ( this->fanPower - fanShaftPower )* this->motorInAirFrac;
+				this->outletAirEnthalpy = this->inletAirEnthalpy + powerLossToAir / localAirMassFlow;
+				this->outletAirHumRat = this->inletAirHumRat;
+				this->outletAirMassFlowRate =  localAirMassFlow;
+				this->outletAirTemp = Psychrometrics::PsyTdbFnHW( this->outletAirEnthalpy, this->outletAirHumRat );
+				
+				// When fan air flow is less than 10%, the fan power curve is linearized between the 10% to 0% to
+			//  avoid the unrealistic high temperature rise across the fan.
+				Real64 deltaTAcrossFan = this->outletAirTemp - this->inletAirTemp;
+				if ( deltaTAcrossFan > 20.0 ) {
+					Real64 minFlowFracLimitFanHeat = 0.10;
+					Real64 powerFractionAtLowMin = 0.0;
+					Real64 fanPoweratLowMinimum = 0.0;
+					if ( localFlowFractionForPower < minFlowFracLimitFanHeat ) {
+						powerFractionAtLowMin = CurveManager::CurveValue( this->powerModFuncFlowFractionCurveIndex, minFlowFracLimitFanHeat );
+
+						fanPoweratLowMinimum = powerFractionAtLowMin * this->maxAirMassFlowRate * localPressureRise / ( localFanTotEff * this->rhoAirStdInit );
+						this->fanPower = localFlowFractionForPower * fanPoweratLowMinimum / minFlowFracLimitFanHeat;
+					} else if ( localFlowFraction < minFlowFracLimitFanHeat ) {
+
+						powerFractionAtLowMin = CurveManager::CurveValue( this->powerModFuncFlowFractionCurveIndex, minFlowFracLimitFanHeat );
+						fanPoweratLowMinimum = powerFractionAtLowMin * this->maxAirMassFlowRate * localPressureRise / ( localFanTotEff * this->rhoAirStdInit );
+						this->fanPower = localFlowFraction * fanPoweratLowMinimum / minFlowFracLimitFanHeat;
+					}
+					fanShaftPower = this->motorEff * this->fanPower; // power delivered to shaft
+					powerLossToAir = fanShaftPower + ( this->fanPower - fanShaftPower ) * this->motorInAirFrac;
+					this->outletAirEnthalpy = this->inletAirEnthalpy + powerLossToAir / localAirMassFlow;
+					// This fan does not change the moisture or Mass Flow across the component
+					this->outletAirHumRat = this->inletAirHumRat;
+					this->outletAirMassFlowRate = localAirMassFlow;
+					this->outletAirTemp = Psychrometrics::PsyTdbFnHW( this->outletAirEnthalpy, this->outletAirHumRat );
+				}
+				break;
+			} // continuous speed control case
+			} // end switch
+
+		} else { // fan is off
+			//Fan is off and not operating no power consumed and mass flow rate.
+			this->fanPower = 0.0;
+
+			this->outletAirMassFlowRate = 0.0;
+			this->outletAirHumRat = this->inletAirHumRat;
+			this->outletAirEnthalpy = this->inletAirEnthalpy;
+			this->outletAirTemp = this->inletAirTemp;
+			// Set the Control Flow variables to 0.0 flow when OFF.
+			this->massFlowRateMaxAvail = 0.0;
+			this->massFlowRateMinAvail = 0.0;
+		}
+
+	}
+
+	void
+	FanSystem::update() const // does not change state of object, only update elsewhere
+	{
+		// Set the outlet air node of the fan
+		DataLoopNode::Node( this->outletNodeNum ).MassFlowRate = this->outletAirMassFlowRate;
+		DataLoopNode::Node( this->outletNodeNum ).Temp         = this->outletAirTemp;
+		DataLoopNode::Node( this->outletNodeNum ).HumRat       = this->outletAirHumRat;
+		DataLoopNode::Node( this->outletNodeNum ).Enthalpy     = this->outletAirEnthalpy;
+		// Set the outlet nodes for properties that just pass through & not used
+		DataLoopNode::Node( this->outletNodeNum ).Quality = DataLoopNode::Node( this->inletNodeNum ).Quality;
+		DataLoopNode::Node( this->outletNodeNum ).Press   = DataLoopNode::Node( this->inletNodeNum ).Press;
+
+		// Set the Node Flow Control Variables from the Fan Control Variables
+		DataLoopNode::Node( this->outletNodeNum ).MassFlowRateMaxAvail = this->massFlowRateMaxAvail;
+		DataLoopNode::Node( this->outletNodeNum ).MassFlowRateMinAvail = this->massFlowRateMinAvail;
+
+		if ( DataContaminantBalance::Contaminant.CO2Simulation ) {
+			DataLoopNode::Node( this->outletNodeNum ).CO2 = DataLoopNode::Node( this->inletNodeNum ).CO2;
+		}
+
+		if ( DataContaminantBalance::Contaminant.GenericContamSimulation ) {
+			DataLoopNode::Node( this->outletNodeNum ).GenContam = DataLoopNode::Node( this->inletNodeNum ).GenContam;
+		}
+
+		//ugly use of global here
+		DataHVACGlobals::FanElecPower = this->fanPower;
+		DataAirLoop::LoopOnOffFanRTF  = this->fanRunTimeFractionAtSpeed[ this->numSpeeds - 1 ]; //fill with RTF from highest speed level
+
+	}
+
+	void
+	FanSystem::report()
+	{
+		this->fanEnergy = this->fanPower * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+		this->deltaTemp = this->outletAirTemp - this->inletAirTemp;
 	}
 
 
