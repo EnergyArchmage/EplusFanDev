@@ -1825,7 +1825,7 @@ namespace SimAirServingZones {
 						if ( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num == OAMixer_Num ) {
 							FoundOASys = true;
 						}
-						if ( CompTypeNum == Fan_Simple_CV || CompTypeNum == Fan_Simple_VAV || CompTypeNum == Fan_ComponentModel || CompTypeNum ==  Fan_Simple_Object ) {
+						if ( CompTypeNum == Fan_Simple_CV || CompTypeNum == Fan_Simple_VAV || CompTypeNum == Fan_ComponentModel ) {
 							if ( PrimaryAirSystem(AirLoopNum).OASysExists ) {
 								if ( FoundOASys ) {
 									if ( PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3 ) {
@@ -2833,7 +2833,7 @@ namespace SimAirServingZones {
 		} else if ( SELECT_CASE_var == Fan_Simple_VAV ) { // 'Fan:VariableVolume'
 			SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 
-		} else if ( SELECT_CASE_var == FanType_SystemModelObject ) { // "Fan:SystemModel" new for V8.5
+		} else if ( SELECT_CASE_var == Fan_Simple_Object ) { // "Fan:SystemModel" new for V8.5
 			if ( CompIndex == 0 ) { // 0 means has not been filled because of 1-based arrays in old fortran
 				CompIndex = HVACFan::getFanObjectVectorIndex( CompName ) + 1;
 			}

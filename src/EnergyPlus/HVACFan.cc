@@ -24,6 +24,7 @@
 #include <Psychrometrics.hh>
 #include <DataContaminantBalance.hh>
 #include <DataPrecisionGlobals.hh>
+#include <BranchNodeConnections.hh>
 
 namespace EnergyPlus {
 
@@ -230,7 +231,7 @@ namespace HVACFan {
 	{
 	
 
-		std::string const routineName = "Fan constructor ";
+		std::string const routineName = "HVACFan constructor ";
 		int numAlphas; // Number of elements in the alpha array
 		int numNums; // Number of elements in the numeric array
 		int IOStat; // IO Status when calling get input subroutine
@@ -256,6 +257,8 @@ namespace HVACFan {
 		}
 		this->inletNodeNum = NodeInputManager::GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 3 ), errorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs( 1 ), DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Inlet, 1, DataLoopNode::ObjectIsNotParent );
 		this->outletNodeNum = NodeInputManager::GetOnlySingleNode( DataIPShortCuts::cAlphaArgs( 4 ), errorsFound, DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs( 1 ), DataLoopNode::NodeType_Air, DataLoopNode::NodeConnectionType_Outlet, 1, DataLoopNode::ObjectIsNotParent );
+
+		BranchNodeConnections::TestCompSet( DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs( 1 ),  DataIPShortCuts::cAlphaArgs( 3 ),  DataIPShortCuts::cAlphaArgs( 4 ),"Air Nodes" );
 
 		this->designAirVolFlowRate =  DataIPShortCuts::rNumericArgs( 1 );
 		if ( this->designAirVolFlowRate = DataSizing::AutoSize ) {
@@ -372,6 +375,8 @@ namespace HVACFan {
 			}
 
 		}
+
+
 
 		if ( errorsFound ) {
 			ShowFatalError( routineName + "Errors found in input.  Program terminates." );
