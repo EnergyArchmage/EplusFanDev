@@ -229,7 +229,71 @@ namespace HVACFan {
 		std::string const objectName
 	)
 	{
-	
+		//initialize all data
+		name                      = ""; 
+		fanType                   = ""; 
+		fanType_Num               = 0; 
+		availSchedIndex           = 0; 
+		inletNodeNum              = 0;
+		outletNodeNum             = 0; 
+		designAirVolFlowRate      = 0.0; 
+		designAirVolFlowRateWasAutosized = false; 
+		speedControl = speedControlNotSet; 
+		minPowerFlowFrac          = 0.0; 
+		deltaPress                = 0.0; 
+		motorEff                  = 0.0; 
+		motorInAirFrac            = 0.0; 
+		designElecPower           = 0.0; 
+		designElecPowerWasAutosized = false;
+		powerSizingMethod = powerSizingMethodNotSet; 
+		elecPowerPerFlowRate      = 0.0; 
+		elecPowerPerFlowRatePerPressure = 0.0; 
+		fanTotalEff               = 0.0; 
+		powerModFuncFlowFractionCurveIndex = 0; 
+		nightVentPressureDelta    = 0.0; 
+		nightVentFlowFraction     = 0.0;
+		zoneNum                   = 0; 
+		zoneRadFract              = 0.0;
+		heatLossesDestination     = heatLossNotDetermined;
+		endUseSubcategoryName     = "";
+		numSpeeds                 = 0; 
+		//std::vector < Real64 > flowFractionAtSpeed; //array of flow fractions for speed levels
+		//std::vector < Real64 > powerFractionAtSpeed; // array of power fractions for speed levels
+		//std::vector < bool > powerFractionInputAtSpeed;
+		//std::vector < Real64 > massFlowAtSpeed;
+		//std::vector < Real64 > totEfficAtSpeed;
+		inletAirMassFlowRate      = 0.0; 
+		outletAirMassFlowRate     = 0.0;
+		minAirFlowRate            = 0.0; 
+		maxAirMassFlowRate        = 0.0; 
+		minAirMassFlowRate        = 0.0; 
+		inletAirTemp              = 0.0;
+		outletAirTemp             = 0.0;
+		inletAirHumRat            = 0.0;
+		outletAirHumRat           = 0.0;
+		inletAirEnthalpy          = 0.0;
+		outletAirEnthalpy         = 0.0;
+		objTurnFansOn             = false;
+		objTurnFansOff            = false;
+		objEnvrnFlag              = true; 
+		objSizingFlag             = true;  
+		fanPower                  = 0.0; 
+		fanEnergy                 = 0.0; 
+	 // std::vector < Real64 > fanRunTimeFractionAtSpeed;
+		maxAirFlowRateEMSOverrideOn   = false; 
+		maxAirFlowRateEMSOverrideValue = 0.0; 
+		eMSFanPressureOverrideOn = false; 
+		eMSFanPressureValue      = 0.0; 
+		eMSFanEffOverrideOn      = false; 
+		eMSFanEffValue           = 0.0; 
+		eMSMaxMassFlowOverrideOn = false; 
+		eMSAirMassFlowValue      = 0.0; 
+		faultyFilterFlag         = false; 
+		faultyFilterIndex        = 0; 
+		massFlowRateMaxAvail     = 0.0;
+		massFlowRateMinAvail     = 0.0;
+		rhoAirStdInit            = 0.0;
+		oneTimePowerCurveCheck   = true; 
 
 		std::string const routineName = "HVACFan constructor ";
 		int numAlphas; // Number of elements in the alpha array
@@ -283,9 +347,9 @@ namespace HVACFan {
 		this->motorInAirFrac   = DataIPShortCuts::rNumericArgs( 5 );
 		this->designElecPower  = DataIPShortCuts::rNumericArgs( 6 );
 		if ( this->designElecPower == DataSizing::AutoSize ) {
-			this->designAirVolFlowRateWasAutosized = true;
+			this->designElecPowerWasAutosized = true;
 		}
-		if ( this->designAirVolFlowRateWasAutosized ) {
+		if ( this->designElecPowerWasAutosized ) {
 			if ( DataIPShortCuts::lAlphaFieldBlanks( 6 ) ) {
 				this->powerSizingMethod = powerPerFlowPerPressure;
 			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "PowerPerFlow" ) ) {
@@ -298,11 +362,11 @@ namespace HVACFan {
 				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 				ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 6 ) + " = " + DataIPShortCuts::cAlphaArgs( 6 ) );
 				errorsFound = true;
-
-				this->elecPowerPerFlowRate            = DataIPShortCuts::rNumericArgs( 7 );
-				this->elecPowerPerFlowRatePerPressure = DataIPShortCuts::rNumericArgs( 8 );
-				this->fanTotalEff                     = DataIPShortCuts::rNumericArgs( 9 );
 			}
+			this->elecPowerPerFlowRate            = DataIPShortCuts::rNumericArgs( 7 );
+			this->elecPowerPerFlowRatePerPressure = DataIPShortCuts::rNumericArgs( 8 );
+			this->fanTotalEff                     = DataIPShortCuts::rNumericArgs( 9 );
+
 		}
 		if ( ! DataIPShortCuts::lAlphaFieldBlanks( 7 ) ) {
 			this->powerModFuncFlowFractionCurveIndex = CurveManager::GetCurveIndex( DataIPShortCuts::cAlphaArgs( 7 ) );
@@ -464,6 +528,7 @@ namespace HVACFan {
 				break;
 			}
 			case speedControlContinuous: {
+				localFanTotEff = this->fanTotalEff;
 				Real64 localFlowFractionForPower = max( this->minPowerFlowFrac, localFlowFraction );
 				Real64 localPowerFraction = CurveManager::CurveValue( this->powerModFuncFlowFractionCurveIndex, localFlowFractionForPower );
 				this->fanPower = localPowerFraction * this->maxAirMassFlowRate * localPressureRise / ( localFanTotEff * this->rhoAirStdInit );
