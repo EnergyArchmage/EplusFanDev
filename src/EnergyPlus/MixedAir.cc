@@ -152,7 +152,7 @@ namespace MixedAir {
 	int const DXHeatPumpSystem( 19 );
 	int const Coil_UserDefined( 20 );
 	int const UnitarySystem( 21 );
-	int const Fan_Simple_Object( 22 );
+	int const Fan_System_Object( 22 );
 
 	int const ControllerSimple( 1 );
 	int const ControllerOutsideAir( 2 );
@@ -615,7 +615,7 @@ namespace MixedAir {
 				SimulateFanComponents( CompName, FirstHVACIteration, CompIndex );
 			}
 
-		} else if ( SELECT_CASE_var == Fan_Simple_Object) { // 'Fan:SystemModel'
+		} else if ( SELECT_CASE_var == Fan_System_Object) { // 'Fan:SystemModel'
 			if ( CompIndex == 0 ) {// 0 means has not been filled because of 1-based arrays in old fortran
 				CompIndex = HVACFan::getFanObjectVectorIndex( CompName ) + 1;
 			}
@@ -1132,7 +1132,7 @@ namespace MixedAir {
 				} else if ( SELECT_CASE_var == "FAN:VARIABLEVOLUME" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_Simple_VAV;
 				} else if (  SELECT_CASE_var == "FAN:SYSTEMMODEL" ) {
-					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_Simple_Object;
+					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_System_Object;
 					// construct fan object
 					HVACFan::fanObjs.emplace_back( std::make_unique < HVACFan::FanSystem> ( OutsideAirSys( OASysNum ).ComponentName( CompNum ) ) );
 					OutsideAirSys( OASysNum ).ComponentIndex( CompNum )  = HVACFan::fanObjs.size();

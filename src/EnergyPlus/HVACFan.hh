@@ -147,7 +147,7 @@ public: // Methods
 	Real64 
 	getFanDesignHeatGain(
 		Real64 const FanVolFlow // fan volume flow rate [m3/s]
-	) const;
+	);
 
 
 private: //methods
