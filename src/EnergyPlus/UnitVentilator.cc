@@ -514,7 +514,22 @@ namespace UnitVentilator {
 					UnitVent( UnitVentNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( std::make_unique < HVACFan::FanSystem > ( UnitVent( UnitVentNum ).FanName ) ); // call constructor
 					UnitVent( UnitVentNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitVent( UnitVentNum ).FanName );
-
+					UnitVent( UnitVentNum ).FanOutletNode = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->getFanOutletNode();
+					FanVolFlow = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->getFanDesignVolumeFlowRate();
+					if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitVent( UnitVentNum ).MaxAirVolFlow ) {
+						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+						ShowContinueError( "...air flow rate [" + TrimSigDigits( FanVolFlow, 7 ) + "] in fan object " + UnitVent( UnitVentNum ).FanName + " is less than the unit ventilator maximum supply air flow rate [" + TrimSigDigits( UnitVent( UnitVentNum ).MaxAirVolFlow, 7 ) + "]." );
+						ShowContinueError( "...the fan flow rate must be greater than or equal to the unit ventilator maximum supply air flow rate." );
+						ErrorsFound = true;
+					} else if ( FanVolFlow == AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+						ShowContinueError( "...the fan flow rate is autosized while the unit ventilator flow rate is not." );
+						ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
+					} else if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow == AutoSize ) {
+						ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + UnitVent( UnitVentNum ).Name + "\"" );
+						ShowContinueError( "...the unit ventilator flow rate is autosized while the fan flow rate is not." );
+						ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
+					}
 					UnitVent( UnitVentNum ).FanAvailSchedPtr = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]-> getFanAvailSchIndex();
 
 				}
@@ -2677,9 +2692,11 @@ namespace UnitVentilator {
 		if ( FanOpMode != CycFanCycCoil ) {
 
 			SimUnitVentOAMixer( UnitVentNum, FanOpMode );
-
-			SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-
+			if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
+				SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			} else {
+				HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
+			}
 			if ( UnitVent( UnitVentNum ).CCoilPresent ) {
 				if ( UnitVent( UnitVentNum ).CCoilType == Cooling_CoilHXAssisted ) {
 					SimHXAssistedCoolingCoil( UnitVent( UnitVentNum ).CCoilName, FirstHVACIteration, On, 0.0, UnitVent( UnitVentNum ).CCoil_Index, ContFanCycCoil );
@@ -2736,9 +2753,11 @@ namespace UnitVentilator {
 			Node( InletNode ).MassFlowRateMaxAvail = AirMassFlow;
 
 			SimUnitVentOAMixer( UnitVentNum, FanOpMode );
-
-			SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-
+			if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) { 
+				SimulateFanComponents( UnitVent( UnitVentNum ).FanName, FirstHVACIteration, UnitVent( UnitVentNum ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+			} else {
+				HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _ );
+			}
 			if ( UnitVent( UnitVentNum ).CCoilPresent ) {
 
 				mdot = UnitVent( UnitVentNum ).MaxColdWaterFlow * PartLoadRatio;
