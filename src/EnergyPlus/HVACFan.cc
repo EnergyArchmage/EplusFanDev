@@ -202,9 +202,10 @@ namespace HVACFan {
 			for ( auto loop=0; loop < this->numSpeeds; ++loop ) {
 				this->massFlowAtSpeed[ loop ] = this->maxAirMassFlowRate * this->flowFractionAtSpeed[ loop ];
 				if ( this->powerFractionInputAtSpeed[ loop ] ) { // use speed power fraction
-					this->totEfficAtSpeed[ loop ] = this->flowFractionAtSpeed[ loop ] * this->designAirVolFlowRate * this->deltaPress  / ( this->designElecPower * powerFractionAtSpeed[ loop ] );
+					this->totEfficAtSpeed[ loop ] = this->flowFractionAtSpeed[ loop ] * this->designAirVolFlowRate * this->deltaPress  / ( this->designElecPower * this->powerFractionAtSpeed[ loop ] );
 				} else { // use power curve
 					this->totEfficAtSpeed[ loop ] = this->flowFractionAtSpeed[ loop ] * this->designAirVolFlowRate * this->deltaPress  / ( this->designElecPower * CurveManager::CurveValue( this->powerModFuncFlowFractionCurveIndex, this->flowFractionAtSpeed[ loop ] ) );
+					this->powerFractionAtSpeed[ loop ] = CurveManager::CurveValue( this->powerModFuncFlowFractionCurveIndex, this->flowFractionAtSpeed[ loop ] );
 				}
 				
 			}
@@ -421,6 +422,19 @@ namespace HVACFan {
 				ShowContinueError( "Fan with Discrete speed control does not have input for speed data that matches the number of speeds.");
 				errorsFound = true;
 			}
+			// check that flow fractions are increasing
+			bool increasingOrderError = false;
+			for ( auto loop = 0; loop < (this->numSpeeds - 1); ++loop ) {
+				if ( this->flowFractionAtSpeed[ loop ] >  this->flowFractionAtSpeed[ loop + 1 ]) {
+					increasingOrderError = true;
+				}
+			}
+			if ( increasingOrderError ) {
+				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
+				ShowContinueError( "Fan with Discrete speed control and multiple speed levels does not have input with flow fractions arranged in increasing order.");
+				errorsFound = true;
+			}
+
 		}
 
 		// check if power curve present when any speeds have no power fraction 
@@ -525,12 +539,6 @@ namespace HVACFan {
 			
 			case speedControlDiscrete: {
 				if ( this->numSpeeds == 1 ) { // CV or OnOff
-				//	Real64 const constVolFlowFractionDifference = 0.0001;
-				//	if ( std::abs( localFlowFraction - 1.0 ) < constVolFlowFractionDifference ) { // CV
-					
-				//	} else if ( localFlowFraction < (1.0 - constVolFlowFractionDifference) ) { // On Off
-					
-				//	}
 					localFanTotEff = this->fanTotalEff;
 					this->fanRunTimeFractionAtSpeed[ 0 ] = localFlowFraction;
 					this->fanPower = this->fanRunTimeFractionAtSpeed[ 0 ] * this->maxAirMassFlowRate * localPressureRise / ( localFanTotEff * this->rhoAirStdInit );
@@ -540,9 +548,36 @@ namespace HVACFan {
 					this->outletAirHumRat = this->inletAirHumRat;
 					this->outletAirMassFlowRate =  localAirMassFlow;
 					this->outletAirTemp = Psychrometrics::PsyTdbFnHW( this->outletAirEnthalpy, this->outletAirHumRat );
-				} else if ( this->numSpeeds > 1 ) {
-				
-				
+				} else if ( this->numSpeeds > 1 ) { // multi speed
+
+					// find which two speed levels bracket flow fraction and calculate runtimefraction
+					int lowSideSpeed = -1;
+					int hiSideSpeed  = -1;
+					for ( auto loop = 0; loop < this->numSpeeds; ++loop ) {
+						this->fanRunTimeFractionAtSpeed[ loop ] = 0.0;
+					}
+
+					if ( localFlowFraction < this->flowFractionAtSpeed[ 0 ] ) { // on/off between zero and lowest speed
+						hiSideSpeed  = 0;
+						this->fanRunTimeFractionAtSpeed[ 0 ] = localFlowFraction / this->flowFractionAtSpeed[ 0 ];
+					} else {
+						for ( auto loop = 0; loop < this->numSpeeds - 1; ++loop ) {
+							if ( ( this->flowFractionAtSpeed[ loop ] <= localFlowFraction ) && ( localFlowFraction <= flowFractionAtSpeed[ loop + 1 ] ) ) {
+								lowSideSpeed = loop;
+								hiSideSpeed = loop +1;
+								break;
+							}
+						}
+						this->fanRunTimeFractionAtSpeed[ lowSideSpeed ] = ( this->flowFractionAtSpeed[ hiSideSpeed ] - localFlowFraction ) / ( this->flowFractionAtSpeed[ hiSideSpeed ] - this->flowFractionAtSpeed[ lowSideSpeed ] );
+						this->fanRunTimeFractionAtSpeed[ hiSideSpeed ] = ( localFlowFraction - this->flowFractionAtSpeed[ lowSideSpeed ] ) / ( this->flowFractionAtSpeed[ hiSideSpeed ] - this->flowFractionAtSpeed[ lowSideSpeed ] );
+					}
+					this->fanPower = this->fanRunTimeFractionAtSpeed[ lowSideSpeed ] * this->massFlowAtSpeed[ lowSideSpeed ] * localPressureRise / ( this->totEfficAtSpeed[ lowSideSpeed ] * this->rhoAirStdInit ) + this->fanRunTimeFractionAtSpeed[ hiSideSpeed ] * this->massFlowAtSpeed[ hiSideSpeed ] * localPressureRise / ( this->totEfficAtSpeed[ hiSideSpeed ] * this->rhoAirStdInit );
+										Real64 fanShaftPower = this->motorEff * this->fanPower;
+					Real64 powerLossToAir = fanShaftPower + ( this->fanPower - fanShaftPower )* this->motorInAirFrac;
+					this->outletAirEnthalpy = this->inletAirEnthalpy + powerLossToAir / localAirMassFlow;
+					this->outletAirHumRat = this->inletAirHumRat;
+					this->outletAirMassFlowRate =  localAirMassFlow;
+					this->outletAirTemp = Psychrometrics::PsyTdbFnHW( this->outletAirEnthalpy, this->outletAirHumRat );
 				}
 
 
@@ -711,6 +746,16 @@ namespace HVACFan {
 			Real64 designHeatGain = this->motorEff * fanPowerTot + ( fanPowerTot - this->motorEff * fanPowerTot ) * this->motorInAirFrac;
 			return designHeatGain;
 
+		}
+	}
+
+	bool
+	FanSystem::getIfContinuousSpeedControl() const 
+	{
+		if (this->speedControl == speedControlContinuous ) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 

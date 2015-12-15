@@ -149,6 +149,8 @@ public: // Methods
 		Real64 const FanVolFlow // fan volume flow rate [m3/s]
 	);
 
+	bool
+	getIfContinuousSpeedControl() const;
 
 private: //methods
 	void
