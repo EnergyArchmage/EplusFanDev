@@ -687,8 +687,7 @@ namespace HVACFan {
 			Real64 fanPowerTot = ( FanVolFlow * this->deltaPress ) / this->fanTotalEff ;
 			Real64 designHeatGain = this->motorEff * fanPowerTot + ( fanPowerTot - this->motorEff * fanPowerTot ) * this->motorInAirFrac;
 			return designHeatGain;
-			//ShowWarningError("FanSystem::getFanDesignHeatGain called before fan sizing completed ");
-			//return 0.0;
+
 		}
 	}
 
