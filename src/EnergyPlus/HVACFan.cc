@@ -524,7 +524,30 @@ namespace HVACFan {
 			switch ( this->speedControl ) {
 			
 			case speedControlDiscrete: {
-			
+				if ( this->numSpeeds == 1 ) { // CV or OnOff
+				//	Real64 const constVolFlowFractionDifference = 0.0001;
+				//	if ( std::abs( localFlowFraction - 1.0 ) < constVolFlowFractionDifference ) { // CV
+					
+				//	} else if ( localFlowFraction < (1.0 - constVolFlowFractionDifference) ) { // On Off
+					
+				//	}
+					localFanTotEff = this->fanTotalEff;
+					this->fanRunTimeFractionAtSpeed[ 0 ] = localFlowFraction;
+					this->fanPower = this->fanRunTimeFractionAtSpeed[ 0 ] * this->maxAirMassFlowRate * localPressureRise / ( localFanTotEff * this->rhoAirStdInit );
+					Real64 fanShaftPower = this->motorEff * this->fanPower;
+					Real64 powerLossToAir = fanShaftPower + ( this->fanPower - fanShaftPower )* this->motorInAirFrac;
+					this->outletAirEnthalpy = this->inletAirEnthalpy + powerLossToAir / localAirMassFlow;
+					this->outletAirHumRat = this->inletAirHumRat;
+					this->outletAirMassFlowRate =  localAirMassFlow;
+					this->outletAirTemp = Psychrometrics::PsyTdbFnHW( this->outletAirEnthalpy, this->outletAirHumRat );
+				} else if ( this->numSpeeds > 1 ) {
+				
+				
+				}
+
+
+
+				localFanTotEff = this->fanTotalEff;
 				break;
 			}
 			case speedControlContinuous: {
