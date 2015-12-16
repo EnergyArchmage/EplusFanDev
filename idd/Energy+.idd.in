@@ -33687,10 +33687,11 @@ ZoneHVAC:EvaporativeCoolerUnit,
    A7 , \field Supply Air Fan Object Type
         \required-field
         \type choice
+        \key Fan:SystemModel
+        \key Fan:ComponentModel        
         \key Fan:ConstantVolume
         \key Fan:OnOff
         \key Fan:VariableVolume
-        \key Fan:ComponentModel
    A8 , \field Supply Air Fan Name
         \required-field
         \type object-list

@@ -155,18 +155,18 @@ namespace HVACFan {
 	FanSystem::set_size()
 	{
 		std::string const routineName = "HVACFan::set_size ";
-		if ( this->designAirVolFlowRateWasAutosized ) {
-			Real64 tempFlow = this->designAirVolFlowRate;
-			bool bPRINT = true;
-			DataSizing::DataAutosizable = true;
-			DataSizing::DataEMSOverrideON = this->maxAirFlowRateEMSOverrideOn;
-			DataSizing::DataEMSOverride   = this->maxAirFlowRateEMSOverrideValue;
-			ReportSizingManager::RequestSizing(this->fanType, this->name, DataHVACGlobals::SystemAirflowSizing, "Design Maximum Air Flow Rate [m3/s]", tempFlow, bPRINT, routineName );
-			this->designAirVolFlowRate    = tempFlow;
-			DataSizing::DataAutosizable   = true;
-			DataSizing::DataEMSOverrideON = false;
-			DataSizing::DataEMSOverride   = 0.0;
-		}
+	
+		Real64 tempFlow = this->designAirVolFlowRate;
+		bool bPRINT = true;
+		DataSizing::DataAutosizable = true;
+		DataSizing::DataEMSOverrideON = this->maxAirFlowRateEMSOverrideOn;
+		DataSizing::DataEMSOverride   = this->maxAirFlowRateEMSOverrideValue;
+		ReportSizingManager::RequestSizing(this->fanType, this->name, DataHVACGlobals::SystemAirflowSizing, "Design Maximum Air Flow Rate [m3/s]", tempFlow, bPRINT, routineName );
+		this->designAirVolFlowRate    = tempFlow;
+		DataSizing::DataAutosizable   = true;
+		DataSizing::DataEMSOverrideON = false;
+		DataSizing::DataEMSOverride   = 0.0;
+
 
 		if ( this->designElecPowerWasAutosized ) {
 		
@@ -326,7 +326,7 @@ namespace HVACFan {
 		BranchNodeConnections::TestCompSet( DataIPShortCuts::cCurrentModuleObject, DataIPShortCuts::cAlphaArgs( 1 ),  DataIPShortCuts::cAlphaArgs( 3 ),  DataIPShortCuts::cAlphaArgs( 4 ),"Air Nodes" );
 
 		this->designAirVolFlowRate =  DataIPShortCuts::rNumericArgs( 1 );
-		if ( this->designAirVolFlowRate = DataSizing::AutoSize ) {
+		if ( this->designAirVolFlowRate == DataSizing::AutoSize ) {
 			this->designAirVolFlowRateWasAutosized = true;
 		}
 

@@ -478,7 +478,7 @@ namespace UnitHeater {
 				ShowSevereError( CurrentModuleObject + " \"" + UnitHeat( UnitHeatNum ).Name + "\" " + cAlphaFields( 9 ) + " not found: " + Alphas( 9 ) );
 				ErrorsFound = true;
 			} else if ( lAlphaBlanks( 9 ) ) {
-				if ( UnitHeat( UnitHeatNum ).FanType_Num == FanType_SimpleOnOff ||  UnitHeat( UnitHeatNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				if ( UnitHeat( UnitHeatNum ).FanType_Num == FanType_SimpleOnOff || UnitHeat( UnitHeatNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 					UnitHeat( UnitHeatNum ).OpMode = CycFanCycCoil;
 				} else {
 					UnitHeat( UnitHeatNum ).OpMode = ContFanCycCoil;

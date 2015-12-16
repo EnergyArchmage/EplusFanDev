@@ -8255,7 +8255,7 @@ This optional alpha input field defines the name of an HVAC system node which ca
 
 #### Field: Supply Air Fan Object Type
 
-This alpha input field defines the type of fan used by the zone evaporative cooler unit.  There are four valid choices: Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume, or Fan:ComponentModel.  However the type of fan must be consistent with the control method defined below and a variable speed fan is needed with ZoneCoolingLoadVariableSpeedFan.
+This alpha input field defines the type of fan used by the zone evaporative cooler unit.  There are five valid choices: Fan:SystemModel, Fan:ComponentModel, Fan:ConstantVolume, Fan:OnOff, or Fan:VariableVolume.  (Note that Fan:ConstantVolume, Fan:OnOff, and Fan:VariableVolume may be deprecated in a future version and as of version 8.5 these are being replaced by Fan:SystemModel.) However the type of fan must be consistent with the control method defined below and a variable speed fan is needed with ZoneCoolingLoadVariableSpeedFan.
 
 #### Field: Supply Air Fan Name
 
