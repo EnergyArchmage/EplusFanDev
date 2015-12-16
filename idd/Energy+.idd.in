@@ -33590,8 +33590,8 @@ ZoneHVAC:UnitHeater,
         \key Fan:OnOff
         \key Fan:ConstantVolume
         \key Fan:VariableVolume
-        \note Allowable fan types are Fan:ConstantVolume, Fan:OnOff and
-        \note Fan:VariableVolume
+        \key Fan:SystemModel
+        \note Allowable fan types are Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume and Fan:SystemModel
    A6 , \field Supply Air Fan Name
         \required-field
         \type object-list

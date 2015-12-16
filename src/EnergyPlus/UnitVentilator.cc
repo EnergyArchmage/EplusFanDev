@@ -446,18 +446,6 @@ namespace UnitVentilator {
 
 			UnitVent( UnitVentNum ).AirOutNode = GetOnlySingleNode( Alphas( 7 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
-			// Fan information:
-			//   A11, \field Supply Air Fan Object Type
-			//        \required-field
-			//        \type choice
-			//        \key Fan:ConstantVolume
-			//        \key Fan:VariableVolume
-			//        \note Allowable fan types are Fan:ConstantVolume and
-			//        \note Fan:VariableVolume
-			//   A12, \field Fan Name
-			//        \required-field
-			//        \type object-list
-			//        \object-list FansCVandVAV
 
 			UnitVent( UnitVentNum ).FanType = Alphas( 11 );
 			UnitVent( UnitVentNum ).FanName = Alphas( 12 );
@@ -530,7 +518,7 @@ namespace UnitVentilator {
 						ShowContinueError( "...the unit ventilator flow rate is autosized while the fan flow rate is not." );
 						ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
 					}
-					UnitVent( UnitVentNum ).FanAvailSchedPtr = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]-> getFanAvailSchIndex();
+					UnitVent( UnitVentNum ).FanAvailSchedPtr = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->getFanAvailSchIndex();
 
 				}
 			}
@@ -603,7 +591,7 @@ namespace UnitVentilator {
 				ShowSevereError( CurrentModuleObject + " \"" + UnitVent( UnitVentNum ).Name + "\" " + cAlphaFields( 14 ) + " not found: " + Alphas( 14 ) );
 				ErrorsFound = true;
 			} else if ( lAlphaBlanks( 14 ) ) {
-				if ( UnitVent( UnitVentNum ).FanType_Num == FanType_SimpleOnOff ) {
+				if ( UnitVent( UnitVentNum ).FanType_Num == FanType_SimpleOnOff || UnitVent( UnitVentNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
 					UnitVent( UnitVentNum ).OpMode = CycFanCycCoil;
 				} else {
 					UnitVent( UnitVentNum ).OpMode = ContFanCycCoil;

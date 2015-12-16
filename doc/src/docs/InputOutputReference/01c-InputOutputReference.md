@@ -2353,11 +2353,11 @@ See Figure 96 or Figure 97. This field applies only if Ventilation Control Mode 
 
 #### Field: Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
 
-See Figure 96. This field applies only if Ventilation Control Mode = Temperature. This value may be from zero to less than 100˚C, with the default being 0˚C. The value for this field must be less than the value specified for the following field.
+See Figure 96. This field applies only if Ventilation Control Mode = Temperature. This value may be from zero to less than 100&deg;C, with the default being 0&deg;C. The value for this field must be less than the value specified for the following field.
 
 #### Field: Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor
 
-See Figure 96. This field applies only if Ventilation Control Mode = Temperature. This value must be greater than 0˚C, with the default being 100˚C. The value for this field must be greater than the value specified for the previous field..
+See Figure 96. This field applies only if Ventilation Control Mode = Temperature. This value must be greater than 0&deg;C, with the default being 100&deg;C. The value for this field must be greater than the value specified for the previous field..
 
 #### Field: Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
 
@@ -2685,13 +2685,13 @@ Where
 
 where
 
-ρ = Air density at the specific air temperature and humidity ratio conditions [kg/m<sup>3</sup>]
+&rho; = Air density at the specific air temperature and humidity ratio conditions [kg/m<sup>3</sup>]
 
-ν = Air kinetic viscosity at the specific air temperature condition [m<sup>2</sup>/s]
+&nu; = Air kinetic viscosity at the specific air temperature condition [m<sup>2</sup>/s]
 
-ρ<sub>o</sub> = Air density at the reference air conditions provided by the object AirflowNetwork:MultiZone:ReferenceCrackConditions specified in the field Reference Crack Conditions [kg/m<sup>3</sup>]
+&rho;<sub>o</sub> = Air density at the reference air conditions provided by the object AirflowNetwork:MultiZone:ReferenceCrackConditions specified in the field Reference Crack Conditions [kg/m<sup>3</sup>]
 
-ν<sub>o</sub> = Air kinetic viscosity at the reference air temperature provided by the object AirflowNetwork:MultiZone:ReferenceCrackConditions specified in the field Reference Crack Conditions [m<sup>2</sup>/s]
+&nu;<sub>o</sub> = Air kinetic viscosity at the reference air temperature provided by the object AirflowNetwork:MultiZone:ReferenceCrackConditions specified in the field Reference Crack Conditions [m<sup>2</sup>/s]
 
 Note: The correction factor shown above is use for this particular component as specified.
 
@@ -2735,7 +2735,7 @@ where
 
 *ELA*   = Effective leakage area [m<sup>2</sup>]
 
-ρ       = Air density [kg/m<sup>3</sup>]
+&rho;       = Air density [kg/m<sup>3</sup>]
 
 <span>\(\Delta {P_r}\)</span>  = Reference pressure difference [Pa]
 
@@ -2998,13 +2998,13 @@ Where
 
 where
 
-ρ = Air density at the specific air temperature and humidity ratio conditions [kg/m<sup>3</sup>]
+&rho; = Air density at the specific air temperature and humidity ratio conditions [kg/m<sup>3</sup>]
 
-ν = Air kinetic viscosity at the specific air temperature condition [m<sup>2</sup>/s]
+&nu; = Air kinetic viscosity at the specific air temperature condition [m<sup>2</sup>/s]
 
-ρ<sub>o</sub> = Air density at the reference air conditions provided by the object AirflowNetwork:MultiZone:ReferenceCrackConditions specified in the field Reference Crack Conditions [kg/m<sup>3</sup>]
+&rho;<sub>o</sub> = Air density at the reference air conditions provided by the object AirflowNetwork:MultiZone:ReferenceCrackConditions specified in the field Reference Crack Conditions [kg/m<sup>3</sup>]
 
-ν<sub>o</sub> = Air kinetic viscosity at the reference air temperature provided by the object AirflowNetwork:MultiZone:ReferenceCrackConditions specified in the field Reference Crack Conditions [m<sup>2</sup>/s]
+&nu;<sub>o</sub> = Air kinetic viscosity at the reference air temperature provided by the object AirflowNetwork:MultiZone:ReferenceCrackConditions specified in the field Reference Crack Conditions [m<sup>2</sup>/s]
 
 Note: The correction factor shown above is used when the exhaust fan is off. The airflow direction is based on the pressure difference between the zone and outdoors.
 
@@ -3446,13 +3446,13 @@ C<sub>T</sub> = Temperature correction factor
 
 where
 
-ρ = Air density at the specific air temperature and humidity ratio conditions [kg/m<sup>3</sup>]
+&rho; = Air density at the specific air temperature and humidity ratio conditions [kg/m<sup>3</sup>]
 
-ν = Air kinetic viscosity at the specific air temperature condition [m<sup>2</sup>/s]
+&nu; = Air kinetic viscosity at the specific air temperature condition [m<sup>2</sup>/s]
 
-ρ<sub>o</sub> = Air density at air conditions of 20°C, 0 kg/kg and 101325 Pa [kg/m<sup>3</sup>]
+&rho;<sub>o</sub> = Air density at air conditions of 20°C, 0 kg/kg and 101325 Pa [kg/m<sup>3</sup>]
 
-ν<sub>o</sub> = Air kinetic viscosity at an air temperature of 20°C [m<sup>2</sup>/s]
+&nu;<sub>o</sub> = Air kinetic viscosity at an air temperature of 20°C [m<sup>2</sup>/s]
 
 Note: The correction factor shown above is use for this particular component as specified.
 
@@ -7435,11 +7435,15 @@ The name of an outdoor air mixer component (object:OutdoorAir:Mixer) which compo
 
 This field specifies the type of supply air fan object used by this fan coil. The supply air fan is part of the fan coil compound object. The only valid supply air fan types are:
 
+* Fan:SystemModel
+
 * Fan:OnOff
 
 * Fan:ConstantVolume
 
 * Fan:VariableVolume
+
+Note that Fan:SystemModel was added as of version 8.5 and is recommended for use in new models.  Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume may be deprecated in a future version.
 
 #### Field: Supply Air Fan Name
 
@@ -7809,11 +7813,15 @@ This field is a node name used to identify the node associated with the “mixed
 
 This field specifies the type of supply air fan used by this unit ventilator. The supply air fan is part of the unit ventilator compound object. The only valid supply air fan types are:
 
+* Fan:SystemModel
+
 * Fan:OnOff
 
 * Fan:ConstantVolume
 
 * Fan:VariableVolume
+
+Note that Fan:SystemModel was added as of version 8.5 and is recommended for use in new models.  Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume may be deprecated in a future version.
 
 #### Field: Supply Air Fan Name
 
@@ -7825,7 +7833,7 @@ This field allows the user to specify the coil operating options as one of the f
 
 #### Field: Supply Air Fan Operating Mode Schedule Name
 
-This field is a schedule name (ref: Schedule) that determines the operating modes of the unit ventilator’s On:Off fan. A schedule value of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule value greater than 0 (usually 1 is used) indicates constant fan operation (fan runs continually regardless of the coils operation). If this input field is left blank, then the operating mode of the On:Off fan type defaults to cycling operation.
+This field is a schedule name (ref: Schedule) that determines the operating modes of the unit ventilator’s On:Off fan. A schedule value of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule value greater than 0 (usually 1 is used) indicates constant fan operation (fan runs continually regardless of the coils operation). If this input field is left blank, then the operating mode defaults to cycling operation for the Fan:SystemModel or Fan:OnOff types of fans.
 
 #### Field: Heating Coil Object Type
 
@@ -8058,11 +8066,15 @@ This field is a node name used to identify the node that serves as the outlet (a
 
 This field specifies the type of supply air fan used by this unit heater. The supply air fan is part of the unit heater compound object. The only valid supply air fan types are:
 
+* Fan:SystemModel
+
 * Fan:OnOff
 
 * Fan:ConstantVolume
 
 * Fan:VariableVolume
+
+Note that Fan:SystemModel was added as of version 8.5 and is recommended for use in new models.  Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume may be deprecated in a future version.
 
 #### Field: Supply Air Fan Name
 
@@ -8090,7 +8102,7 @@ This field is the name of the heating coil that is part of the unit heater syste
 
 #### Field: Supply Air Fan Operating Mode Schedule Name
 
-This field is a schedule name (ref: Schedule) that determines the operating modes of the unit heater’s On:Off fan. A schedule value of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule value greater than 0 (usually 1 is used) indicates constant fan operation (fan runs continually regardless of the coils operation). If this input field is left blank, then the operating mode of the On:Off fan type defaults to cycling operation.
+This field is a schedule name (ref: Schedule) that determines the operating modes of the unit heater’s On:Off fan. A schedule value of 0 indicates cycling fan operation (fan cycles with cooling/heating coil). A schedule value greater than 0 (usually 1 is used) indicates constant fan operation (fan runs continually regardless of the coils operation). If this input field is left blank, then the operating mode defaults to cycling operation for the Fan:SystemModel or Fan:OnOff types of fans.
 
 #### Field: Supply Air Fan Operation During No Heating
 
@@ -10947,7 +10959,7 @@ This input field eanbles DX Cooling coils to be used for 100% outdoor air dedica
 
 #### Field: DOAS DX Cooling Coil Leaving Minimum Air Temperature
 
-This input field is DX Cooling coils leaving minimum air temperature for frost control. The DX cooling coil leaving air temperature is not allowed to exceed this minimum air temperature. The DX cooling coil frost controller adjusts or limits the desired coil outlet air setpoint temperature when the coil outlet temperature exceeds this minimum temperature limit specified. This input field is optional and only used along with in the input field above. The minimum and maximum values of this input field are 0.0C and 7.2C, and the default value is 2.0°C.
+This input field is DX Cooling coils leaving minimum air temperature for frost control. The DX cooling coil leaving air temperature is not allowed to exceed this minimum air temperature. The DX cooling coil frost controller adjusts or limits the desired coil outlet air setpoint temperature when the coil outlet temperature exceeds this minimum temperature limit specified. This input field is optional and only used along with in the input field above. The minimum and maximum values of this input field are 0.0&deg;C and 7.2&deg;C, and the default value is 2.0&deg;C.
 
 #### Field: Latent Load Control
 
@@ -13894,7 +13906,7 @@ This alpha field defines the cooling energy input ratio modifier (function of pa
 
 #### Field: Cooling Combination Ratio Correction Factor Curve Name
 
-This alpha field defines the cooling combination ratio (CR) correction factor curve name for combination ratios greater than or equal to 1. The combination ratio is defined as the total rated indoor terminal unit cooling capacity divided by this heat pump’s gross rated total cooling capacity. The curve is a linear, quadratic or cubic equation and uses the minimum value of x in the curve object to determine the maximum part-load ratio which is linearly proportional to capacity (i.e., the minimum value of x [CR] in the curve object must be ≥1). The output of this curve provides a multiplier (&gt;1) which is applied to this heat pump’s Gross Rated Total Cooling Capacity. Between a combination ratio of 1 and the curve’s minimum value of x, the multiplier is linearly interpolated. For combination ratio’s less than 1 (i.e., the total indoor terminal unit capacity is less than this heat pump’s rated total capacity), capacity is directly proportional to part-load ratio and this curve will not be used.
+This alpha field defines the cooling combination ratio (CR) correction factor curve name for combination ratios greater than or equal to 1. The combination ratio is defined as the total rated indoor terminal unit cooling capacity divided by this heat pump’s gross rated total cooling capacity. The curve is a linear, quadratic or cubic equation and uses the minimum value of x in the curve object to determine the maximum part-load ratio which is linearly proportional to capacity (i.e., the minimum value of x [CR] in the curve object must be &leq;1). The output of this curve provides a multiplier (&gt;1) which is applied to this heat pump’s Gross Rated Total Cooling Capacity. Between a combination ratio of 1 and the curve’s minimum value of x, the multiplier is linearly interpolated. For combination ratio’s less than 1 (i.e., the total indoor terminal unit capacity is less than this heat pump’s rated total capacity), capacity is directly proportional to part-load ratio and this curve will not be used.
 
 #### Field: Cooling Part-Load Fraction Correlation Curve Name
 
@@ -13958,7 +13970,7 @@ This alpha field defines the heating energy input ratio modifier (function of pa
 
 #### Field: Heating Combination Ratio Correction Factor Curve Name
 
-This alpha field defines the heating combination ratio (CR) correction factor curve name for combination ratios greater than or equal to 1. The combination ratio is defined as the total rated indoor heating capacity divided by the rated heat pump heating capacity. The curve is either quadratic or cubic and uses the minimum value of x in the curve object to determine the maximum part-load ratio which is linearly proportional to capacity (i.e., the minimum value of x in the curve object must be ≥1). The output of this curve provides a multiplier (&gt;1) which is applied to the Nominal Heat Pump Heating Capacity. Between a combination ratio of 1 and the curve’s minimum value of x, the multiplier is linearly interpolated. For combination ratio’s less than 1, capacity is directly proportional to part-load ratio and this curve will not be used. If this field is left blank, the Cooling Combination Ratio Correction factor will be used.
+This alpha field defines the heating combination ratio (CR) correction factor curve name for combination ratios greater than or equal to 1. The combination ratio is defined as the total rated indoor heating capacity divided by the rated heat pump heating capacity. The curve is either quadratic or cubic and uses the minimum value of x in the curve object to determine the maximum part-load ratio which is linearly proportional to capacity (i.e., the minimum value of x in the curve object must be &geq;1). The output of this curve provides a multiplier (&gt;1) which is applied to the Nominal Heat Pump Heating Capacity. Between a combination ratio of 1 and the curve’s minimum value of x, the multiplier is linearly interpolated. For combination ratio’s less than 1, capacity is directly proportional to part-load ratio and this curve will not be used. If this field is left blank, the Cooling Combination Ratio Correction factor will be used.
 
 #### Field: Heating Part-Load Fraction Correlation Curve Name
 
@@ -14114,7 +14126,7 @@ This numeric field contains the capacity of the heat pump’s electric basin hea
 
 #### Field: Basin Heater Setpoint Temperature
 
-This numeric field contains the set point temperature (˚C) for the basin heater described in the previous field. This field only applies for Condenser Type = EvaporativelyCooled. The basin heater is active when the outdoor air dry-bulb temperature falls below this setpoint temperature, as long as the heat pump is off. This set point temperature must be greater than or equal to 2˚C, and the default value is 2˚C if this field is left blank.
+This numeric field contains the set point temperature (&deg;C) for the basin heater described in the previous field. This field only applies for Condenser Type = EvaporativelyCooled. The basin heater is active when the outdoor air dry-bulb temperature falls below this setpoint temperature, as long as the heat pump is off. This set point temperature must be greater than or equal to 2&deg;C, and the default value is 2&deg;C if this field is left blank.
 
 #### Field: Basin Heater Operating Schedule Name
 
@@ -17443,7 +17455,7 @@ The name of the zone where the refrigerated case is located. The refrigerated ca
 
 #### Field: Rated Ambient Temperature
 
-Dry-bulb temperature of the ambient (zone) air surrounding the refrigerated case at the rating conditions for refrigerated case performance. The default value for this field is 23.9˚C (75˚F). This temperature must be greater than 0˚C and greater than the case operating temperature.
+Dry-bulb temperature of the ambient (zone) air surrounding the refrigerated case at the rating conditions for refrigerated case performance. The default value for this field is 23.9&deg;C (75&deg;F). This temperature must be greater than 0&deg;C and greater than the case operating temperature.
 
 #### Field: Rated Ambient Relative Humidity
 
@@ -17467,7 +17479,7 @@ The length of the refrigerated case in meters. The entered value for this field 
 
 #### Field: Case Operating Temperature
 
-The average temperature of the air and products within the refrigerated case in ˚C. The refrigerated case manufacturer typically provides this information in the product literature. Typical operating temperatures for medium temperature cases are 1.6˚C to 7.2˚C (35˚F to 45˚F). Typical operating temperatures for low temperatures cases are -28.9˚C to -17.8˚C        (-20˚F to 0˚F). The entered value for this field must be less than 20˚C and lower than the Rated Ambient Temperature. The default value is 1.1˚C if the field is blank.
+The average temperature of the air and products within the refrigerated case in &deg;C. The refrigerated case manufacturer typically provides this information in the product literature. Typical operating temperatures for medium temperature cases are 1.6&deg;C to 7.2&deg;C (35&deg;F to 45&deg;F). Typical operating temperatures for low temperatures cases are -28.9&deg;C to -17.8&deg;C (-20&deg;F to 0&deg;F). The entered value for this field must be less than 20&deg;C and lower than the Rated Ambient Temperature. The default value is 1.1&deg;C if the field is blank.
 
 #### Field: Latent Case Credit Curve Type
 
@@ -17871,11 +17883,11 @@ The total, full load cooling capacity (sensible plus latent) in watts (W) at rat
 
 #### Field: Operating Temperature
 
-The rated average temperature of the air and products within the walk-in cooler in ˚C. The entered value for this field must be less than 20˚C. There is no default value.
+The rated average temperature of the air and products within the walk-in cooler in &deg;C. The entered value for this field must be less than 20&deg;C. There is no default value.
 
 #### Field: Rated Cooling Source Temperature
 
-For a DX evaporator coil, enter the saturated evaporating temperature in ˚C.  For a fluid coil, enter the fluid coil entrance temperature in ˚C. There is no default value. This number is used, with temperatures for other refrigeration loads on any one system, to set that system’s minimum suction pressure or minimum circulating fluid temperature. (This value is not used if the walkin is cooled by a compressor rack object.)
+For a DX evaporator coil, enter the saturated evaporating temperature in &deg;C.  For a fluid coil, enter the fluid coil entrance temperature in &deg;C. There is no default value. This number is used, with temperatures for other refrigeration loads on any one system, to set that system’s minimum suction pressure or minimum circulating fluid temperature. (This value is not used if the walkin is cooled by a compressor rack object.)
 
 #### Field: Rated Total Heating Power
 
@@ -20807,11 +20819,11 @@ This field is ONLY used if the Capacity Rating Type is CapacityTotalSpecificCond
 
 #### Field: Rated Cooling Source Temperature
 
-For a DX evaporator coil, enter the saturated evaporating temperature in ˚C.  For a fluid coil, enter the fluid coil entrance temperature in ˚C. There is no default value. This number is used, with temperatures for other refrigeration loads on any one system, to set that system’s minimum suction pressure or minimum circulating fluid temperature.
+For a DX evaporator coil, enter the saturated evaporating temperature in &deg;C.  For a fluid coil, enter the fluid coil entrance temperature in &deg;C. There is no default value. This number is used, with temperatures for other refrigeration loads on any one system, to set that system’s minimum suction pressure or minimum circulating fluid temperature.
 
 #### Field: Rated Temperature Difference DT1
 
-The rated difference between the air entering the refrigeration chiller and the cooling source temperature in ˚C. The entered value for this field must be less than 20˚C. There is no default value.
+The rated difference between the air entering the refrigeration chiller and the cooling source temperature in &deg;C. The entered value for this field must be less than 20&deg;C. There is no default value.
 
 #### Field: Maximum Difference Between Inlet Air and Evaporating Temperature
 
