@@ -1881,56 +1881,33 @@ Air System Fans <a name="Fans"></a>
 
 ### Overview
 
-Four input objects (Fan, Fan:ConstantVolume, Fan:VariableVolume, and Fan:OnOff) provide models for fans -- the prime movers in most of the air loop and zonal air conditioning systems in EnergyPlus. The *Fan* input object was added for version 8.5 with the intent that it provide a single versatile input object that will eventually replace Fan:ConstantVolume, Fan:VariableVolume, and Fan:OnOff. For these input objects, EnergyPlus uses a simple polynomial-based curve-fit model to describe the relation between the volume flow rate and the fan electric power, with no explicit modeling of fan pressure rise. Consequently, duct-static-pressure reset strategies can only be modeled using curves that have been specially developed to approximate static reset.  For CAV and VAV central air-handling systems, a fifth input object (Fan:ComponentModel) provides a simple physics-based model for flow-dependent fan pressure rise and detailed models for fan, belt, motor, and variable-frequency-drive efficiencies and energy use. This latter input object provides the capability to analyze the effects of duct-static-pressure reset strategies, as well as changes in fan system element performance. All of these fan models calculate the fan energy usage, which is often a large fraction of HVAC energy use and a significant portion of the building energy consumption. They also calculate the temperature rise in the air stream caused by the static pressure increase as the air goes through the fan. If the motor and belt are in the air stream, waste heat from the motor and belt also acts to raise the air stream temperature.
+Three input objects (Fan:ConstantVolume, Fan:VariableVolume, and Fan:OnOff) provide models for fans -- the prime movers in most of the air loop and zonal air conditioning systems in EnergyPlus. For these input objects, EnergyPlus uses a simple polynomial-based curve-fit model to describe the relation between the volumetric flow rate and the fan electric power, with no explicit modeling of fan pressure rise. Consequently, duct-static-pressure reset strategies cannot be modeled using this approach. For CAV and VAV central air-handling systems, a fourth input object (Fan:ComponentModel) provides a simple physics-based model for flow-dependent fan pressure rise and detailed models for fan, belt, motor, and variable-frequency-drive efficiencies and energy use. This latter input object provides the capability to analyze the effects of duct-static-pressure reset strategies, as well as changes in fan system element performance. All of these fan models calculate the fan energy usage, which is often a large fraction of HVAC energy use and a significant portion of the building energy consumption. They also calculate the temperature rise in the air stream caused by the static pressure increase as the air goes through the fan. If the motor and belt are in the air stream, waste heat from the motor and belt also acts to raise the air stream temperature.
 
 ### Model
 
-Each of the five fan models is a forward type: the model inputs describe the fan characteristics and the conditions of the air at the fan inlet; the outputs are the fan electrical power consumption and the conditions of the air at the fan outlet. The model algorithms and data for Fan:ConstantVolume, Fan:VariableVolume, Fan:OnOff and Fan:ComponentModel are contained in the *Fans.cc* and *Fans.hh* files in EnergyPlus.  The source code for the Fan model added for version 8.5 is contained in the *FanObject.cc* and *FanObject.hh* files. 
+Each of the four fan models is a forward type: the model inputs describe the fan characteristics and the conditions of the air at the fan inlet; the outputs are the fan electrical power consumption and the conditions of the air at the fan outlet. The model algorithms and data are contained in the *Fans* module in EnergyPlus.
 
 #### Inputs and Data
 
-For the *Fan* model (added for version 8.5), the user describes the fan by entering values for the design pressure rise across the fan, the design volume flow rate, the design electric power consumption, and the fan motor efficiency. The user also needs to specify the fraction of the fan motor's waste heat that will enter the air stream (usually 0 or 1). If the fan is indoors, the name of a Zone and a fraction for the split between thermal radiation and convection can be entered so that the portion of fan motor waste heat that does not enter the air stream can be added to the thermal zone surrounding the fan. The user enters a choice for fan speed control method to be either Continuous (for VAV) or Discrete (for constant volume, on-off, two-speed, or multi-speed).  A performance curve or lookup table defined separately can be referenced by the fan to describe the variation in fan power as a function of flow rate. This curve is required for continuous speed control. However, for discrete speed control the user has the option of directly entering a power modification factor for each discrete speed and a curve is not necessary. For two- or multi-speed fans, the number of speeds is entered and pairs of values for the flow fraction and power fraction at each speed level are entered in increasing order. The design electric power consumption can be autosized using input values for one of three available scaling factors: fan total efficiency, electric power per unit flow rate, or electric power per unit flow rate per unit pressure.
-
-For the Fan:ConstantVolume, Fan:VariableVolume, and Fan:OnOff models, the user describes the fan by entering values for the design pressure rise across the fan, the design volume flow rate, the fan total efficiency, and the fan motor efficiency.  The user also needs to specify the fraction of the fan waste heat that will enter the air stream (usually 0 or 1). For the Fan:VariableVolume model, the user must also enter the coefficients of a 4<sup>th</sup> order polynomial that relates the fan mass flow rate to the fan power consumption. The independent variable is the volume flow fraction; the dependent variable is the fan power part load ratio. For multi-speed fans, the user must enter a fan power ratio as a function of speed ratio performance curve name. Multi-speed fans can only be simulated in a parent object which allows multiple fan speeds (e.g., AirLoopHVAC:Unitary:Furnace:HeatCool, ZoneHVAC:PackagedTerminalAirConditioner, etc.). An optional efficiency curve may also be used when simulating multispeed fans to adjust the fan total efficiency as the fan speed changes.
+For the Fan:ConstantVolume, Fan:VariableVolume, and Fan:OnOff models, the user describes the fan by entering values for the design pressure rise across the fan, the design volumetric flow rate, the fan total efficiency, and the fan motor efficiency. The user also needs to specify the fraction of the fan waste heat that will enter the air stream (usually 0 or 1). For the Fan:VariableVolume model, the user must also enter the coefficients of a 4<sup>th</sup> order polynomial that relates the fan mass flow rate to the fan power consumption.The independent variable is the volumetric flow fraction; the dependent variable is the fan power part load ratio. For multi-speed fans, the user must enter a fan power ratio as a function of speed ratio performance curve name. Multi-speed fans can only be simulated in a parent object which allows multiple fan speeds (e.g., AirLoopHVAC:Unitary:Furnace:HeatCool, ZoneHVAC:PackagedTerminalAirConditioner, etc.). An optional efficiency curve may also be used when simulating multi-speed fans to adjust the fan total efficiency as the fan speed changes.
 
 For the Fan:ComponentModel object, the user describes the fan in more detail, and also describes the duct system characteristics as seen by the fan. In particular, the user specifies a pressure rise curve with four coefficients that relates the fan total pressure rise to the volumetric flow through the fan, the duct-static-pressure set-point, and the static pressure of the spaces surrounding the ducts. If duct-static-pressure reset is used, the user enters a linear curve with two coefficients that relates the pressure set-point to the volumetric flow through the fan. For the fan itself, the user specifies the fan geometry (wheel diameter and outlet area), maximum efficiency, the Euler number corresponding to the maximum efficiency, the maximum dimensionless flow, the names of four curves with several coefficients that describe the variation of fan efficiency and dimensionless flow with the Euler number in the normal and stall operation regions of the fan, and a sizing factor (applied to the maximum flow through the fan). For the belt, the user specifies the maximum efficiency (or a curve with five coefficients that defines the maximum efficiency as a function of maximum fan shaft input power), three curves with three coefficients each that relate the belt part-load efficiency to belt fractional output torque, the motor/fan pulley diameter ratio, the belt output torque capacity, and a sizing factor (applied to the maximum output torque of the belt). For the motor, the user specifies the maximum efficiency (or a curve with three coefficients that define the maximum efficiency as a function of maximum belt input power), a curve with three coefficients that relate the motor part-load efficiency to motor fractional output power, and a sizing factor (applied to the maximum output power of the motor). For the variable-frequency-drive (VFD), the user specifies a curve with three coefficients that relate the VFD part-load efficiency to motor fractional input power or to motor fractional speed, and a sizing factor (applied to the maximum output power of the VFD).
 
 #### Control
 
-The models must decide whether the fan is on or off. The primary on/off trigger is the fan availability schedule. This is an on/off schedule associated with each fan: a value of 1 indicates the fan is on; a value of 0 indicates the fan is off. The fan schedule can be overruled by flags set by system availability managers. If the flag *TurnFansOn* is true, a zero fan schedule value will be overridden and the fan will be turned on. If the flag *TurnFansOff* is true the fan will be forced off. The inlet air mass flow rate must be greater than zero for the fan to be on.
+The models must decide whether the fan is on or off. The primary on/off trigger is the fan schedule. This is an on/off schedule associated with each fan: a value of 1 indicates the fan is on; a value of 0 indicates the fan is off. The fan schedule can be overruled by flags set by system availability managers. If the flag *TurnFansOn* is true, a zero fan schedule value will be overridden and the fan will be turned on. If the flag *TurnFansOff* is true the fan will be forced off. The inlet air mass flow rate must be greater than zero for the fan to be on.
 
 Generally the fan is a passive component: it accepts the mass flow on its inlet node, uses it in its calculations of energy consumption and temperature rise, and passes it to the outlet node. However the fan maximum and minimum airflow rates act as absolute limits on the airflow rate.
 
-For multi-speed fans, the parent object determines the fan speed ratio (i.e., the selected speed of the fan motor) and uses this value to determine flow rate and electric power consumption.  For a Fan operating with the Discrete speed control, the fan model determines the faction of time spent at the discrete speeds that bound it and will produce the average flow requested by the parent object.  Then the fan electric power consumption is determined for each speed level and combined using a time-weighted average.  For a fan operating with Continuous speed control and a fan modeled with the Fan:OnOff object, the electric power is evaluated using the power ratio performance curve at the (average) flow fraction requested by the parent object. 
-
+For multi-speed fans, the parent object determines the fan speed ratio (i.e., the selected speed of the fan motor) and uses this value in conjunction with the fan power ratio performance curve to calculate the full load fan power. This full load fan power is then used to determine the part-load performance of the fan and motor assembly.
 
 #### Simulation
-
-For the *Fan* model based on design electric power consumption, the fan's total efficiency is determined at the beginning of the simulation using:
-
-<div>$${e_{tot,max}} = \frac{({\dot V_{design,max} \cdot \Delta P  } )}{{ \dot Q_{tot, design}}}$$</div>
-
-For a fan with discrete speed control with more than one speed and input data for Speed *x* Electric Power Fraction, the fan's total efficiency at each speed *x* is determined and stored using:
-
-<div>$${e_{tot,x}} = \frac {({f_{flow,x}} \cdot {\dot V_{design,max} \cdot \Delta P  } )}{( {f_{power,x}} \cdot { \dot Q_{tot, design}})}$$</div>
-
-For a fan with discrete speed control and no data for the power fraction at a speed, the power performance curve (or table) is evaluated first using the flow fraction for the speed:
-
-<div>$${f_{power,x}} =  {func_{power curve}}({f_{flow,x}})$$</div>
-
-The fan model and EnergyPlus's modeling of flow at air system nodes is actually calculated using mass flow rates.  User input for design maximum volume flow rate is converted to a design mass flow rate using a design density of air that is adjusted for altitude above sea level and dry air at 20 &deg;C drybulb.
-
-<div>$${\dot m_{design,max}} = {\dot V_{design, max}} \cdot  {\rho_{air,design}}$$</div>
-
-For a fan with discrete speed control with more than one speed, the design mass flow rate at each speed is determined and stored using:
-
-<div>$${\dot m_{design,x}} = {f_{flow,x}} \cdot {\dot V_{design,max}}$$</div>
 
 Simple (Single Speed) Fan Model
 
 The following equations define the model for this fan:
 
-<div>$${\dot Q_{tot}} = \dot m\cdot \Delta P/({e_{tot,max}}\cdot {\rho_{air}})$$</div>
+<div>$${\dot Q_{tot}} = \dot m\cdot \Delta P/({e_{tot}}\cdot {\rho_{air}})$$</div>
 
 <div>$${\dot Q_{shaft}} = {e_{motor}}\cdot {\dot Q_{tot}}$$</div>
 
@@ -1942,48 +1919,7 @@ The following equations define the model for this fan:
 
 <div>$${T_{out}} = PsyTdbFnHW({h_{out}},{w_{out}})$$</div>
 
-Fan Model for Changing Flow Rates
-
-The fan will operate at a flow fraction that is determined by other HVAC equipment in the air system.  A parent object will control the air flow rates and the fan flow fraction is defined as the ratio of the current mass flow rate divided by the design mass flow rate.
-
-<div>$${f_{flow, cur}} = \frac{\dot m_{cur}}{\dot m_{design,max}}$$</div>
-
-The determination of electric power consumed at a flow fraction depends on if the speed control method is discrete or continuous.
-
-Discrete Speed Control 
-
-For the *Fan* model using discrete speed control, with the number of fan speeds set at 1, and the flow fraction is less than one, then the fan will be modeled as cycling between "off" and "on" over the timestep.  The time fraction is equal to the flow fraction so that:
- 
-<div>$${RTF_{On}} = {f_{flow, cur}}$$</div>
-
-<div>$${\dot Q_{tot,elec}} = {RTF_{On}} \cdot \left( \frac{\dot m\cdot \Delta P}{{e_{tot}}\cdot {\rho_{air}}}\right)$$</div>
-
-Similarly, for two-speed and multi-speed fans, the current flow fraction will be used to find the run time fraction for each of the adjacent speed levels *x* and *x+1* that bracket the flow fraction such that
-
-<div>$$ {f_{flow,x}} \leq {f_{flow, cur}} \leq {f_{flow,x+1}} $$</div>  
-
-The runtime fraction spent at each speed is determined using
-
-<div>$${RFT_{x}} = \left( \frac{({f_{flow,x+1}} - {f_{flow, cur}} )}{({f_{flow,x+1}} - {f_{flow,x}})}  \right)$$</div>
-
-<div>$${RFT_{x+1}} = \left( \frac{({f_{flow, cur}} - {f_{flow,x}} )}{({f_{flow,x+1}} - {f_{flow,x}})}  \right)$$</div>
-
-The electric power consumption is calculated using the design mass flow rates and the total efficiency stored for each speed and combined using the runtime fraction at each speed.
-
-<div>$${\dot Q_{tot,elec}} = {RTF_{x}} \cdot \left( \frac{\dot m_{design,x}\cdot \Delta P}{{e_{tot,x}}\cdot {\rho_{air}}}\right)  +  {RTF_{x+1}} \cdot \left( \frac{\dot m_{design,x+1}\cdot \Delta P}{{e_{tot,x+1}}\cdot {\rho_{air}}}\right) $$</div> 
-
-The temperature of the air stream leaving the fan is calculated as above using this result for total power. 
-
-
-Continuous Speed Control
-
-For the *Fan* model using Continuous control the flow fraction is used to evaluate the power performance modification factor which is defined in a separate curve or table.  
-
-<div>$${f_{power,cur}} =  {func_{power curve}}({f_{flow,cur}})$$</div>
-
-<div>$${e_{tot,cur}} = \frac {( { \dot m_{cur} \cdot \Delta P  } )}{( {f_{power,cur}} \cdot { \dot Q_{tot, design} \cdot \rho_{air}})}$$</div>
-
-Fan:OnOff Fan Model
+On/Off Fan Model
 
 The on/off fan model is similar to the simple fan model with the exception that the on/off fan may cycle on and off during a simulation time step. The cycling rate of the fan is known as the run time fraction. The calculation of run time fraction accounts for the part-load losses of other equipment used in the HVAC system. A part-load factor (a.k.a. part-load ratio) is first calculated for the fan as the ratio of the actual operating mass flow rate to the maximum fan mass flow rate. The run time fraction is then calculated as the part-load factor divided by the part-load fraction. The part-load fraction is determined by other HVAC equipment in the simulation (Ref. DX coil) for use by this specific fan model.
 
@@ -2043,7 +1979,7 @@ The rest of the calculation is the same as for the simple fan.
 
 <span>\(\dot m\)</span>is the air mass flow in kg/s;
 
-<span>\({\dot m_{design,max}}\)</span>is the design (maximum) air flow in kg/s;
+<span>\({\dot m_{design}}\)</span>is the design (maximum) air flow in kg/s;
 
 <span>\(\Delta P\)</span>is the fan design pressure increase in Pascals;
 
