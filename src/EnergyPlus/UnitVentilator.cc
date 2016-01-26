@@ -573,7 +573,7 @@ namespace UnitVentilator {
 				} else if ( InputProcessor::SameString( UnitVent( UnitVentNum ).FanType, "Fan:SystemModel" ) ) {
 					UnitVent( UnitVentNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( std::make_unique < HVACFan::FanSystem > ( UnitVent( UnitVentNum ).FanName ) ); // call constructor
-					UnitVent( UnitVentNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitVent( UnitVentNum ).FanName );
+					UnitVent( UnitVentNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitVent( UnitVentNum ).FanName ); //zero-based
 					UnitVent( UnitVentNum ).FanOutletNode = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->getFanOutletNode();
 					FanVolFlow = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->getFanDesignVolumeFlowRate();
 					if ( FanVolFlow != AutoSize && UnitVent( UnitVentNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitVent( UnitVentNum ).MaxAirVolFlow ) {
