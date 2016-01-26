@@ -473,7 +473,7 @@ namespace UnitHeater {
 					}
 				} else if ( InputProcessor::SameString( UnitHeat( UnitHeatNum ).FanType, "Fan:SystemModel") ) {
 					UnitHeat( UnitHeatNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
-					HVACFan::fanObjs.emplace_back( std::make_unique < HVACFan::FanSystem > ( UnitHeat( UnitHeatNum ).FanName ) ); // call constructor
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( UnitHeat( UnitHeatNum ).FanName ) ); // call constructor
 					UnitHeat( UnitHeatNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitHeat( UnitHeatNum ).FanName ); //zero-based
 					UnitHeat( UnitHeatNum ).FanOutletNode = HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->getFanOutletNode();
 					FanVolFlow =  HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->getFanDesignVolumeFlowRate();

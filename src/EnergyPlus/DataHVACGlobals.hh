@@ -59,9 +59,6 @@
 #ifndef DataHVACGlobals_hh_INCLUDED
 #define DataHVACGlobals_hh_INCLUDED
 
-// C++ Headers
-#include <memory>
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
 
@@ -501,7 +498,6 @@ namespace DataHVACGlobals {
 	extern OptStartDataType OptStartData; // For optimum start
 	extern Array1D< ComponentSetPtData > CompSetPtEquip;
 
-//	std::vector < std::unique_ptr <HVACFan> > fanObjs;
 	// Clears the global data in DataHVACGlobals.
 	// Needed for unit tests, should not be normally called.
 	void

@@ -40616,7 +40616,7 @@ Fan:SystemModel,
        \default Discrete
   N2 , \field Electric Power Minimum Flow Rate Fraction
        \type real
-       \default 0.2      
+       \default 0.2
        \minimum 0.0
        \maximum 1.0
   N3 , \field Design Pressure Rise
@@ -40657,7 +40657,7 @@ Fan:SystemModel,
        \units W/((m3/s) -Pa)
        \ip-units W/((ft3/min)-inH2O)
        \default 1.66667
-  N9,  \field Fan Total Efficiency 
+  N9,  \field Fan Total Efficiency
        \type real
        \default 0.7
        \minimum>0.0
@@ -59181,9 +59181,9 @@ Pump:VariableSpeed,
        \maximum 1.0
        \default 0.9
   N5 , \field Fraction of Motor Inefficiencies to Fluid Stream
-        \minimum 0.0
-        \maximum 1.0
-        \default 0.0
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
   N6 , \field Coefficient 1 of the Part Load Performance Curve
        \default 0.0
   N7 , \field Coefficient 2 of the Part Load Performance Curve
@@ -67180,8 +67180,8 @@ ThermalStorage:Ice:Detailed,
        \object-list UniVariateTables
   A7 , \field Charging Curve Object Type
        \type choice
-       \key Curve:QuadraticLinear
-       \key Curve:CubicLinear
+       \key QuadraticLinear
+       \key CubicLinear
   A8 , \field Charging Curve Name
        \type object-list
        \object-list QuadraticLinearCurves

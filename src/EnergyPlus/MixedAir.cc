@@ -1195,7 +1195,7 @@ namespace MixedAir {
 				} else if (  SELECT_CASE_var == "FAN:SYSTEMMODEL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = Fan_System_Object;
 					// construct fan object
-					HVACFan::fanObjs.emplace_back( std::make_unique < HVACFan::FanSystem> ( OutsideAirSys( OASysNum ).ComponentName( CompNum ) ) );
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( OutsideAirSys( OASysNum ).ComponentName( CompNum ) ) );
 					OutsideAirSys( OASysNum ).ComponentIndex( CompNum )  = HVACFan::fanObjs.size();
 					//cpw22Aug2010 Add Fan:ComponentModel (new)
 				} else if ( SELECT_CASE_var == "FAN:COMPONENTMODEL" ) {
