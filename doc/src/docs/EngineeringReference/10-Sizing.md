@@ -1097,6 +1097,19 @@ Otherwise <span>\(\dot{V}_{fan,max} = \max\left(\text{DesHeatVolFlowzone},\text{
 
 If the max fan flow rate is less than *SmallAirVolFlow* the max flow rate is set to zero.
 
+#### Design Electric Power Consumption
+
+The new simple fan model added for version 8.5 can size a Design Electric Power Consumption.  The maximum air flow rate is determined first and then the design electric power is calculated using one of three methods which can be selected by the user. 
+
+1. Power Per Flow. This scaling factor is defined such that Design Electric Power Consumption = (Electric Power Per Unit Flow Rate) * (Design Maximum Air Flow Rate).
+2. Power Per Flow Per Pressure. This scaling factor is defined such that Design Electric Power Consumption = (Electric Power Per Unit Flow Rate Per Unit Pressure) * (Design Maximum Air Flow Rate) * (Design Pressure Rise).
+3. Total Efficiency. The total efficiency is defined such that the Design Electric Power Consumption = (Design Maximum Air Flow Rate) * (Design Pressure Rise) / (Fan Total Efficiency).
+
+
+
+
+If a hard value for Design Electric Power Consumption is entered by the user
+
 ### Coil:Cooling:Water
 
 The sizing is done in function *SizeWaterCoil* of module *WaterCoils*
