@@ -3517,12 +3517,8 @@ namespace EvaporativeCoolers {
 				ZoneEvapUnit( UnitLoop ).FanObjectClassName = Alphas( 7 );
 				ZoneEvapUnit( UnitLoop ).FanName = Alphas( 8 );
 				errFlag = false;
-				GetFanType( ZoneEvapUnit( UnitLoop ).FanName, ZoneEvapUnit( UnitLoop ).FanType_Num, errFlag, CurrentModuleObject, ZoneEvapUnit( UnitLoop ).Name );
-				FanVolFlow = 0.0;
-				if ( errFlag ) {
-					ShowContinueError( "specified in " + CurrentModuleObject + " = " + ZoneEvapUnit( UnitLoop ).Name );
-					ErrorsFound = true;
-				} else {
+				if ( ! InputProcessor::SameString(ZoneEvapUnit( UnitLoop ).FanObjectClassName, "Fan:SystemModel" ) ) {
+					GetFanType( ZoneEvapUnit( UnitLoop ).FanName, ZoneEvapUnit( UnitLoop ).FanType_Num, errFlag, CurrentModuleObject, ZoneEvapUnit( UnitLoop ).Name );
 					GetFanIndex( ZoneEvapUnit( UnitLoop ).FanName, ZoneEvapUnit( UnitLoop ).FanIndex, errFlag, CurrentModuleObject );
 					ZoneEvapUnit( UnitLoop ).FanInletNodeNum = GetFanInletNode( ZoneEvapUnit( UnitLoop ).FanObjectClassName, ZoneEvapUnit( UnitLoop ).FanName, errFlag );
 					ZoneEvapUnit( UnitLoop ).FanOutletNodeNum = GetFanOutletNode( ZoneEvapUnit( UnitLoop ).FanObjectClassName, ZoneEvapUnit( UnitLoop ).FanName, errFlag );
@@ -3534,6 +3530,22 @@ namespace EvaporativeCoolers {
 						ShowContinueError( "...specified in " + CurrentModuleObject + " = " + ZoneEvapUnit( UnitLoop ).Name );
 						ErrorsFound = true;
 					}
+				} else if ( InputProcessor::SameString(ZoneEvapUnit( UnitLoop ).FanObjectClassName, "Fan:SystemModel" ) ){
+
+					ZoneEvapUnit( UnitLoop ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( ZoneEvapUnit( UnitLoop ).FanName ) ); // call constructor
+					ZoneEvapUnit( UnitLoop ).FanIndex = HVACFan::getFanObjectVectorIndex( ZoneEvapUnit( UnitLoop ).FanName );
+					ZoneEvapUnit( UnitLoop ).FanInletNodeNum = HVACFan::fanObjs[ ZoneEvapUnit( UnitLoop ).FanIndex ]->getFanInletNode();
+					ZoneEvapUnit( UnitLoop ).FanOutletNodeNum = HVACFan::fanObjs[ ZoneEvapUnit( UnitLoop ).FanIndex ]->getFanOutletNode();
+					ZoneEvapUnit( UnitLoop ).ActualFanVolFlowRate = HVACFan::fanObjs[ ZoneEvapUnit( UnitLoop ).FanIndex ]->getFanDesignVolumeFlowRate();
+					ZoneEvapUnit( UnitLoop ).FanAvailSchedPtr = HVACFan::fanObjs[ ZoneEvapUnit( UnitLoop ).FanIndex ]->getFanAvailSchIndex();
+				}
+				FanVolFlow = 0.0;
+				if ( errFlag ) {
+					ShowContinueError( "specified in " + CurrentModuleObject + " = " + ZoneEvapUnit( UnitLoop ).Name );
+					ErrorsFound = true;
+
+
 				}
 
 				ZoneEvapUnit( UnitLoop ).DesignAirVolumeFlowRate = Numbers( 1 );

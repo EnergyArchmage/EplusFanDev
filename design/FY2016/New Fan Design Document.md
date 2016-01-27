@@ -31,7 +31,7 @@ A second draft of the design document was produced that incorporates comments.
 
 ## Overview ##
 
-This proposal is for adding an entirely new fan input object that can serve as a direct substitute for Fan:VariableVolume, Fan:ConstantVolume, or Fan:OnOff. In addition it will incorporate input fields needed for night ventilation operation mode so that a separate FanPerformance:NightVentilation is not required when using the night ventilation availability manager. The core fan model will not be significantly changed, but rather the simple (not component model) model variants will be all be available within a single input object.  The exception is that for fans with discrete speed levels, the power calculation will be done using a time-weighted method instead of a flow-weighted method. Also, motor losses not added to the air stream can be rejected to the mechanical room. The older fan objects will be retained for some number of release cycles with the plan that they will eventually be deprecated and transitioned to use the new fan object. 
+This proposal is for adding an entirely new fan input object, to be called Fan:SystemModel, that can serve as a direct substitute for Fan:VariableVolume, Fan:ConstantVolume, or Fan:OnOff. In addition it will incorporate input fields needed for night ventilation operation mode so that a separate FanPerformance:NightVentilation is not required when using the night ventilation availability manager. The core fan model will not be significantly changed, but rather the simple (not component model) model variants will be all be available within a single input object.  The exception is that for fans with discrete speed levels, the power calculation will be done using a time-weighted method instead of a flow-weighted method. Also, motor losses not added to the air stream can be rejected to the mechanical room. The older fan objects will be retained for some number of release cycles with the plan that they will eventually be deprecated and transitioned to use the new fan object. 
 
 ## Approach ##
 
@@ -54,7 +54,7 @@ The new fan will be compared to the older fans with equivalent inputs and result
 
 The fans are described in the file "01d-InputOutputReference.md"  However the I/o reference will be updated throughout wherever fan objects are referenced and the new fan can be used. The Fan I/O description follows:
 
-### Fan
+### Fan:SystemModel
 This object models fans of various types using a relatively simple engineering model. This fan can be used in variable air volume, constant volume, on-off cycling, two-speed, or multi-speed applications.  It was designed as a replacement for Fan:ConstantVolume, Fan:OnOff, Fan:VariableVolume, and FanPerformance:NightVentilation. The electric power consumed by the fan can be directly input or autosized using one of three optional methods.  For fans that can vary the volume flow rate the performance can be described using a separate performance curve or table object. Or for fans with discrete speed control the power fraction at each speed can be input directly with no need for a performance curve.  
 
 #### Field: Name
