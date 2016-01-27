@@ -718,12 +718,21 @@ namespace HVACFan {
 		DataLoopNode::Node( this->outletNodeNum ).MassFlowRateMaxAvail = this->massFlowRateMaxAvail;
 		DataLoopNode::Node( this->outletNodeNum ).MassFlowRateMinAvail = this->massFlowRateMinAvail;
 
+		// make sure inlet has the same mass flow
+		DataLoopNode::Node( this->inletNodeNum ).MassFlowRate = this->outletAirMassFlowRate;
+
 		if ( DataContaminantBalance::Contaminant.CO2Simulation ) {
 			DataLoopNode::Node( this->outletNodeNum ).CO2 = DataLoopNode::Node( this->inletNodeNum ).CO2;
 		}
 
 		if ( DataContaminantBalance::Contaminant.GenericContamSimulation ) {
 			DataLoopNode::Node( this->outletNodeNum ).GenContam = DataLoopNode::Node( this->inletNodeNum ).GenContam;
+		}
+
+
+		if ( this->heatLossesDestination == zoneGains ) {
+		
+		
 		}
 
 		//ugly use of global here
