@@ -32635,11 +32635,12 @@ ZoneHVAC:WindowAirConditioner,
    A7 , \field Supply Air Fan Object Type
         \required-field
         \type choice
+        \key Fan:SystemModel
         \key Fan:OnOff
         \key Fan:ConstantVolume
         \note Fan:ConstantVolume only works when continuous fan operation is used the entire
         \note simulation (all supply air fan operating mode schedule values are greater than 0).
-        \note If any fan operating mode schedule values are 0 a Fan:OnOff object must be used.
+        \note If any fan operating mode schedule values are 0 a Fan:SystemModel or Fan:OnOff object must be used.
    A8 , \field Supply Air Fan Name
         \required-field
         \note Fan type Fan:ConstantVolume is used with continuous fan

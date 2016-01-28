@@ -12975,7 +12975,7 @@ An example of this statement in an IDF is:
        10,                                           !- Rotor Power {W}
        Coil:Heating:Gas,               !- Regeneration Coil Object Type
        Desiccant Regen Coil,       !- Regeneration Coil Name
-       Fan:VariableVolume,           !- Regeneration Fan Object Type
+       Fan:SystemModel,           !- Regeneration Fan Object Type
        Desiccant Regen Fan,         !- Regeneration Fan Name
        UserCurves,                           !- Performance Model Type
        Desiccant DryBulb fTW Curve, !- Leaving Dry-Bulb Function of Entering Dry-Bulb and Humidity Ratio
@@ -13204,7 +13204,7 @@ Following is an example input for this object:
        HeatExchanger:Desiccant:BalancedFlow,   !- Desiccant Heat Exchanger Object Type
        Desiccant Heat Exchanger 1,   !- Desiccant Heat Exchanger Name
        HX Process Outlet Node,   !- Sensor Node Name
-       Fan:ConstantVolume,           !- Regeneration Air Fan Object Type
+       Fan:SystemModel,           !- Regeneration Air Fan Object Type
        Desiccant Regen Fan,         !- Regeneration Air Fan Name
        DrawThrough,                         !- Regeneration Air Fan Placement
        Coil:Heating:Gas,               !- Regeneration Air Heater Object Type

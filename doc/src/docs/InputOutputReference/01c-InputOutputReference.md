@@ -8683,13 +8683,17 @@ The name of an outdoor air mixer component which composes part of the window air
 
 This field specifies the type of supply air fan used by window air conditioner. The supply air fan is part of the window air conditioner compound object. The only valid supply air fan types are:
 
+* Fan:SystemModel
+
 * Fan:OnOff
 
 * Fan:ConstantVolume
 
+Note that Fan:ConstantVolume and Fan:OnOff may be deprecated in a future version and as of version 8.5 these are being replaced by Fan:SystemModel.
+
 #### Field:Supply Air Fan Name
 
-The name of a constant volume fan component that composes part of the window air conditioner. Note that the fan’s maximum flow rate should be the same as the maximum airflow rate of the window air conditioner. A fan of type Fan:OnOff may be used with either cycling or continuous fan, and a fan of type Fan:ConstantVolume is used only with continuous fan (see Supply Air Fan Operating Mode Schedule field below). The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node (for blow through) or the DX coil’s outlet node (for draw through). The fan’s outlet node should be the same as the DX coil’s air inlet node (for blow through) or the window air conditioner’s air outlet node (for draw through).
+The name of a constant volume fan component that composes part of the window air conditioner. Note that the fan’s maximum flow rate should be the same as the maximum airflow rate of the window air conditioner. A fan of type Fan:SystemModel or Fan:OnOff may be used with either cycling or continuous fan, and a fan of type Fan:ConstantVolume is used only with continuous fan (see Supply Air Fan Operating Mode Schedule field below). The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node (for blow through) or the DX coil’s outlet node (for draw through). The fan’s outlet node should be the same as the DX coil’s air inlet node (for blow through) or the window air conditioner’s air outlet node (for draw through).
 
 #### Field: Cooling Coil Object Type
 
