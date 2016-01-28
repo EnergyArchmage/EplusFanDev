@@ -110,6 +110,19 @@ namespace HVACFan {
 		return index;
 	}
 
+	bool
+	checkIfFanNameIsAFanSystem( // look up to see if input contains a Fan:SystemModel with the name (for use before object construction
+		std::string const objectName
+	) {
+	
+		int testNum = InputProcessor::GetObjectItemNum("Fan:SystemModel", objectName );
+		if ( testNum > 0 ) {
+			return true;
+		} else {
+			return false;
+		}
+	
+	}
 
 	void
 	FanSystem::simulate(

@@ -33785,8 +33785,7 @@ ZoneHVAC:OutdoorAirUnit,
        \object-list ScheduleNames
    A5, \field Supply Fan Name
        \required-field
-       \note Allowable fan types are Fan:ConstantVolume and
-       \note Fan:VariableVolume
+       \note Allowable fan types are Fan:SystemModel and Fan:ConstantVolume and Fan:VariableVolume
        \type object-list
        \object-list FansCVandVAV
   A6, \field Supply Fan Placement

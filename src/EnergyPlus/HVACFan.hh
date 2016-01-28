@@ -84,6 +84,11 @@ namespace HVACFan {
 		std::string const objectName
 	);
 
+	bool
+	checkIfFanNameIsAFanSystem(
+		std::string const objectName
+	);
+
 class FanSystem
 {
 

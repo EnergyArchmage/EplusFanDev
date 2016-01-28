@@ -8319,7 +8319,7 @@ ZoneHVAC:EvaporativeCoolerUnit,
    Cooler Unit OA inlet , !- Outdoor Air Inlet Node Name
    Main Zone Inlet Node, !- Cooler Outlet Node Name
    Main Zone Relief Node , !- Zone Relief Air Node Name
-   Fan:ConstantVolume , !- Supply Air Fan Object Type
+   Fan:SystemModel,  !- Supply Air Fan Object Type
    Supply Fan , !- Supply Air Fan Name
    2.0, !- Design Supply Air Flow Rate
    DrawThrough , !- Fan Placement
@@ -8430,7 +8430,7 @@ This field contains a schedule name (ref: Schedule) that contains values for mod
 
 #### Field: Supply Fan Name
 
-This field is the name of a fan (ref: Fan:ConstantVolume, Fan: VariableVolume) that is part of the zone outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the outdoor air control unit.
+This field is the name of a fan (ref: Fan:SystemModel, Fan:ConstantVolume, Fan: VariableVolume) that is part of the zone outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the outdoor air control unit. The supply fan name must be unique to this specific ZoneHVAC:OutdoorAirUnit. 
 
 #### Field: Fan Placement
 
@@ -8444,7 +8444,7 @@ If the user does not select a fan placement type, **DrawThrough** is assumed as 
 
 #### Field: Exhaust Fan Name
 
-This field is the name of a fan (ref: Fan:ConstantVolume, Fan: VariableVolume) that is part of the outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. This field is optional.
+This field is the name of a fan (ref: Fan:SystemModel, Fan:ConstantVolume, Fan: VariableVolume) that is part of the outdoor air unit. This name links the outdoor air unit to particular fan data entered elsewhere in the input data file. This field is optional.
 
 #### Field: Exhaust Air Flow Rate
 
