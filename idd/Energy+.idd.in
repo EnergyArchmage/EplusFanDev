@@ -51144,8 +51144,9 @@ Dehumidifier:Desiccant:NoFans,
        \object-list HeatingCoilName
   A10, \field Regeneration Fan Object Type
        \note Type of fan object for regeneration air.  When using the Default
-       \note Performance Model Type (see below), only Fan:VariableVolume is valid.
+       \note Performance Model Type (see below), only Fan:VariableVolume or Fan:SystemModel are valid.
        \type choice
+       \key Fan:SystemModel
        \key Fan:VariableVolume
        \key Fan:ConstantVolume
   A11, \field Regeneration Fan Name
@@ -51278,6 +51279,7 @@ Dehumidifier:Desiccant:System,
   A6,  \field Regeneration Air Fan Object Type
        \required-field
        \type choice
+       \key Fan:SystemModel
        \key Fan:OnOff
        \key Fan:ConstantVolume
   A7,  \field Regeneration Air Fan Name

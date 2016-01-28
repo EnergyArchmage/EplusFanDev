@@ -12821,7 +12821,7 @@ Name of heating coil object for regeneration air.
 
 #### Field: Regeneration Fan Object Type
 
-Type of fan object for regeneration air. For UserCurves performance (see below) Fan:VariableVolume and Fan:ConstantVolume are valid. For Default performance (see below) only Fan:VariableVolume is valid.
+Type of fan object for regeneration air. For UserCurves performance (see below) Fan:SystemModel, Fan:VariableVolume and Fan:ConstantVolume are valid. For Default performance (see below) only Fan:SystemModel or Fan:VariableVolume are valid.
 
 #### Field: Regeneration Fan Name
 
@@ -13137,7 +13137,7 @@ This alpha field specifies the name of the air loop node used to control desicca
 
 #### Field: Regeneration Air Fan Object Type
 
-This alpha field contains the type of regeneration air fan used. Available fan types are Fan:OnOff and Fan:ConstantVolume.
+This alpha field contains the type of regeneration air fan used. Available fan types are Fan:SystemModel, Fan:OnOff and Fan:ConstantVolume.
 
 #### Field: Regeneration Air Fan Name
 
