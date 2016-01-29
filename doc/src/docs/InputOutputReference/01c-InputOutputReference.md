@@ -8747,7 +8747,7 @@ ZoneHVAC:WindowAirConditioner,
        Zone3WindACAirOutletNode,     ! Air Outlet Node Name
        OutdoorAir:Mixer,             ! Outdoor Air Mixer Object Type
        Zone3WindACOAMixer,           ! Outdoor Air Mixer Name
-       Fan:ConstantVolume,           ! Supply Air Fan Object Type
+       Fan:SystemModel,              ! Supply Air Fan Object Type
        Zone3WindACFan,               ! Fan Name
        Zone3WindACDXCoil,            ! DX Cooling Coil Name
        CyclingFanSch,                ! Supply Air Fan Operation Mode Schedule Name
@@ -8773,17 +8773,22 @@ OutdoorAir:Mixer,
        Zone3WindACAirInletNode;      ! Return Air Stream Node Name
 
 
-Fan:ConstantVolume,
-       Zone3WindACFan,               ! Name
-       FanAndCoilAvailSched,         ! Availability Schedule Name
-       0.5,                          ! Fan Total Efficiency
-       75.0,                         ! Pressure Rise {Pa}
-       0.6,                          ! Maximum Flow Rate {m3/s}
-       0.9,                          ! Motor Efficiency
-       1.0,                          ! Motor In Airstream Fraction
-       Zone3WindACDXOutletNode,      ! Air Inlet Node Name
-       Zone3WindACAirOutletNode;     ! Air Outlet Node Name
-
+Fan:SystemModel,
+       Zone3WindACFan , !- Name
+       FanAndCoilAvailSched , !- Availability Schedule Name
+       Zone3WindACDXOutletNode,  !- Air Inlet Node Name
+       Zone3WindACAirOutletNode,  !- Air Outlet Node Name
+       0.6 , !- Design Maximum Air Flow Rate
+       Discrete , !- Speed Control Method
+       0.0, !- Electric Power Minimum Flow Rate Fraction
+       75.0, !- Design Pressure Rise
+       0.9 , !- Motor Efficiency
+       1.0 , !- Motor In Air Stream Fraction
+       AUTOSIZE, !- Design Electric Power Consumption
+       TotalEfficiencyAndPressure, !- Design Power Sizing Method
+       , !- Electric Power Per Unit Flow Rate
+       , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+       0.5; !- Fan Total Efficiency 
 
 Coil:Cooling:DX:SingleSpeed,
     Zone3WindACDXCoil,       !- Name
@@ -8932,7 +8937,7 @@ This numeric field defines the outdoor air flow rate through the air conditioner
 
 #### Field: Supply Air Fan Object Type
 
-This alpha field defines the type of fan used by this PTAC. The only valid choices are **Fan:OnOff** and **Fan:ConstantVolume**. A fan of type Fan:OnOff is used with cycling fan operating mode, and a fan of type Fan:ConstantVolume is used with continuous fan operating mode (see Supply Air Fan Operating Mode Schedule field below). The input requirements for these fan objects are described elsewhere in this document.
+This alpha field defines the type of fan used by this PTAC. The only valid choices are **Fan:SystemModel**, **Fan:OnOff** and **Fan:ConstantVolume**. A fan of type Fan:SystemModel or Fan:OnOff is used with cycling fan operating mode, and a fan of type Fan:SystemModel or Fan:ConstantVolume is used with continuous fan operating mode (see Supply Air Fan Operating Mode Schedule field below). (Note that Fan:ConstantVolume and Fan:OnOff may be deprecated in a future version and as of version 8.5 these are being replaced by Fan:SystemModel.)  The input requirements for these fan objects are described elsewhere in this document.
 
 #### Field: Supply Air Fan Name
 
@@ -9011,7 +9016,7 @@ ZoneHVAC:PackagedTerminalAirConditioner,
     autosize,              !- Cooling Outdoor Air Flow Rate {m3/s}
     autosize,              !- Heating Outdoor Air Flow Rate {m3/s}
     autosize,              !- No Load Outdoor Air Flow Rate  {m3/s}
-    Fan:OnOff,                      !- Supply Air Fan Object Type
+    Fan:SystemModel,                       !- Supply Air Fan Object Type
     Zone2PTACFan,                          !- Supply Air Fan Name
     Coil:Heating:Electric,                 !- Heating Coil Object Type
     Zone2PTACHeatCoil,                     !- Heating Coil Name
