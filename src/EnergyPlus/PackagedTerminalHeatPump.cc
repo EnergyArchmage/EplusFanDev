@@ -1957,52 +1957,62 @@ namespace PackagedTerminalHeatPump {
 			//Get fan data
 			PTUnit( PTUnitNum ).FanType = Alphas( 7 );
 			PTUnit( PTUnitNum ).FanName = Alphas( 8 );
-			errFlag = false;
-			GetFanType( PTUnit( PTUnitNum ).FanName, PTUnit( PTUnitNum ).FanType_Num, errFlag, CurrentModuleObject, Alphas( 1 ) );
-			FanVolFlow = 0.0;
-			if ( errFlag ) {
-				ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"." );
+			PTUnit( PTUnitNum ).FanName = Alphas( 8 );
+			ValidateComponent( PTUnit( PTUnitNum ).FanType, PTUnit( PTUnitNum ).FanName, IsNotOK, CurrentModuleObject );
+			if ( IsNotOK ) {
+				ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
 				ErrorsFound = true;
-			}
+			} else {
 
-			if ( PTUnit( PTUnitNum ).FanType_Num == FanType_SimpleOnOff ) {
-				ValidateComponent( PTUnit( PTUnitNum ).FanType, PTUnit( PTUnitNum ).FanName, IsNotOK, CurrentModuleObject );
-				if ( IsNotOK ) {
-					ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
-					ErrorsFound = true;
+				if ( SameString( PTUnit( PTUnitNum ).FanType, "Fan:SystemModel" ) ) {
+					PTUnit( PTUnitNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PTUnit( PTUnitNum ).FanName ) ); // call constructor
+					PTUnit( PTUnitNum ).FanIndex = HVACFan::getFanObjectVectorIndex( PTUnit( PTUnitNum ).FanName );
+					FanInletNodeNum  = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanInletNode();
+					FanOutletNodeNum = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanOutletNode();
+					FanVolFlow       = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanDesignVolumeFlowRate();
+					PTUnit( PTUnitNum ).ActualFanVolFlowRate = FanVolFlow;
+					PTUnit( PTUnitNum ).FanAvailSchedPtr = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanAvailSchIndex();
 				} else {
 					errFlag = false;
-					GetFanIndex( PTUnit( PTUnitNum ).FanName, PTUnit( PTUnitNum ).FanIndex, errFlag );
+					GetFanType( PTUnit( PTUnitNum ).FanName, PTUnit( PTUnitNum ).FanType_Num, errFlag, CurrentModuleObject, Alphas( 1 ) );
+					FanVolFlow = 0.0;
 					if ( errFlag ) {
-						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
+						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + PTUnit( PTUnitNum ).Name + "\"." );
 						ErrorsFound = true;
 					}
-					errFlag = false;
-					FanInletNodeNum = GetFanInletNode( PTUnit( PTUnitNum ).FanType, PTUnit( PTUnitNum ).FanName, errFlag );
-					if ( errFlag ) {
-						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
-						ErrorsFound = true;
-					}
-					errFlag = false;
-					FanOutletNodeNum = GetFanOutletNode( PTUnit( PTUnitNum ).FanType, PTUnit( PTUnitNum ).FanName, errFlag );
-					if ( errFlag ) {
-						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
-						ErrorsFound = true;
-					} else {
-						GetFanVolFlow( PTUnit( PTUnitNum ).FanIndex, FanVolFlow );
-						PTUnit( PTUnitNum ).ActualFanVolFlowRate = FanVolFlow;
-					}
-					errFlag = false;
-					PTUnit( PTUnitNum ).FanAvailSchedPtr = GetFanAvailSchPtr( PTUnit( PTUnitNum ).FanType, PTUnit( PTUnitNum ).FanName, errFlag );
-					if ( errFlag ) {
-						ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
-						ErrorsFound = true;
+
+					if ( PTUnit( PTUnitNum ).FanType_Num == FanType_SimpleOnOff ) {
+
+						errFlag = false;
+						GetFanIndex( PTUnit( PTUnitNum ).FanName, PTUnit( PTUnitNum ).FanIndex, errFlag );
+						if ( errFlag ) {
+							ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
+							ErrorsFound = true;
+						}
+						errFlag = false;
+						FanInletNodeNum = GetFanInletNode( PTUnit( PTUnitNum ).FanType, PTUnit( PTUnitNum ).FanName, errFlag );
+						if ( errFlag ) {
+							ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
+							ErrorsFound = true;
+						}
+						errFlag = false;
+						FanOutletNodeNum = GetFanOutletNode( PTUnit( PTUnitNum ).FanType, PTUnit( PTUnitNum ).FanName, errFlag );
+						if ( errFlag ) {
+							ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
+							ErrorsFound = true;
+						} else {
+							GetFanVolFlow( PTUnit( PTUnitNum ).FanIndex, FanVolFlow );
+							PTUnit( PTUnitNum ).ActualFanVolFlowRate = FanVolFlow;
+						}
+						errFlag = false;
+						PTUnit( PTUnitNum ).FanAvailSchedPtr = GetFanAvailSchPtr( PTUnit( PTUnitNum ).FanType, PTUnit( PTUnitNum ).FanName, errFlag );
+						if ( errFlag ) {
+							ShowContinueError( "...specified in " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"." );
+							ErrorsFound = true;
+						}
 					}
 				}
-			} else {
-				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\"" );
-				ShowContinueError( "Illegal " + cAlphaFields( 7 ) + "=\"" + Alphas( 7 ) + "\"." );
-				ErrorsFound = true;
 			}
 
 			//Get heating coil type and name data
@@ -2504,13 +2514,18 @@ namespace PackagedTerminalHeatPump {
 			}
 
 			//Set the Design Fan Volume Flow Rate
-			errFlag = false;
-			GetFanVolFlow( PTUnit( PTUnitNum ).FanIndex, FanVolFlow );
-			PTUnit( PTUnitNum ).ActualFanVolFlowRate = FanVolFlow;
-			if ( errFlag ) {
-				ShowContinueError( "...occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
-				ErrorsFound = true;
+			if ( PTUnit( PTUnitNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+			
+			} else {
+				errFlag = false;
+				GetFanVolFlow( PTUnit( PTUnitNum ).FanIndex, FanVolFlow );
+				PTUnit( PTUnitNum ).ActualFanVolFlowRate = FanVolFlow;
+				if ( errFlag ) {
+					ShowContinueError( "...occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
+					ErrorsFound = true;
+				}
 			}
+
 			//     PTUnit(PTUnitNum)%ActualFanVolFlowRate = MAX(Numbers(1),Numbers(2),Numbers(3))
 			if ( FanVolFlow != AutoSize && PTUnit( PTUnitNum ).ActualFanVolFlowRate != AutoSize ) {
 				if ( PTUnit( PTUnitNum ).ActualFanVolFlowRate > FanVolFlow ) {

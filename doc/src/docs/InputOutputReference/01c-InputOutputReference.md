@@ -9693,7 +9693,7 @@ This numeric field defines the outdoor air flow rate through the heat pump in cu
 
 #### Field: Supply Air Fan Object Type
 
-This alpha field contains the identifying type of supply air fan specified in the heat pump. Fan type must be Fan:OnOff.
+This alpha field contains the identifying type of supply air fan specified in the heat pump. Fan type must be Fan:SystemModel or Fan:OnOff.
 
 #### Field: Supply Air Fan Name
 
@@ -9775,7 +9775,7 @@ This alpha field specifies the name of the supply air fan operating mode schedul
 
 As shown in the example below, correct specifications of the WatertoAirHeatPump requires specification of the following objects in addition to the ZoneHVAC:WaterToAirHeatPump object:
 
-- On/Off fan
+- system model fan
 
 - WatertoAirHeatPump cooling coil (EquationFit only)
 
@@ -9829,7 +9829,7 @@ ZoneHVAC:WaterToAirHeatPump,
     0.0,                      !- Cooling Outdoor Air Flow Rate {m3/s}
     0.0,                      !- Heating Outdoor Air Flow Rate {m3/s}
     ,                         !- No Load Outdoor Air Flow Rate {m3/s}
-    Fan:OnOff,                !- Supply Air Fan Object Type
+    Fan:SystemModel,                !- Supply Air Fan Object Type
     Zone 1 Fan,               !- Supply Air Fan Name
     Coil:Heating:WaterToAirHeatPump:EquationFit,  !- Heating Coil Object Type
     Sys 1 Heat Pump Heating Mode,  !- Heating Coil Name
@@ -9883,16 +9883,22 @@ Schedule:Compact,
     Sys 1 Relief Air Outlet Node,  !- Relief Air Stream Node Name
     Zone 1 Outlet Node;  !- Return Air Stream Node Name
 
-  Fan:OnOff,
+  Fan:SystemModel,
     Zone 1 Fan,              !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Total Efficiency
-    300.0,                   !- Pressure Rise {Pa}
-    Autosize,                !- Maximum Flow Rate {m3/s}
-    0.9,                     !- Motor Efficiency
-    1.0,                     !- Motor In Airstream Fraction
     Sys 1 Mixed Air Node,    !- Air Inlet Node Name
     Sys 1 Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
+    AUTOSIZE , !- Design Maximum Air Flow Rate
+    Discrete , !- Speed Control Method
+    0.0, !- Electric Power Minimum Flow Rate Fraction
+    300.0, !- Design Pressure Rise
+    0.9 , !- Motor Efficiency
+    1.0 , !- Motor In Air Stream Fraction
+    AUTOSIZE, !- Design Electric Power Consumption
+    TotalEfficiencyAndPressure, !- Design Power Sizing Method
+    , !- Electric Power Per Unit Flow Rate
+    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+    0.7; !- Fan Total Efficiency 
 
   Coil:Heating:Gas,
     Heat Pump DX Supp Heating Coil 1,  !- Name
