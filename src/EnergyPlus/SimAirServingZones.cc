@@ -1251,6 +1251,9 @@ namespace SimAirServingZones {
 					} else if ( componentType == "HEATEXCHANGER:AIRTOAIR:FLATPLATE" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = HeatXchngr;
 
+					} else if ( componentType == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT" ) {
+						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = HeatXchngr;
+
 					} else if ( componentType == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW" ) {
 						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = HeatXchngr;
 

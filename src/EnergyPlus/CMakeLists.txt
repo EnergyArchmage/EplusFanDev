@@ -198,6 +198,8 @@ SET( SRC
   EconomicTariff.hh
   ElectricBaseboardRadiator.cc
   ElectricBaseboardRadiator.hh
+  ElectricPowerServiceManager.hh
+  ElectricPowerServiceManager.cc
   EnergyPlus.hh
   EvaporativeCoolers.cc
   EvaporativeCoolers.hh
@@ -328,8 +330,6 @@ SET( SRC
   InternalHeatGains.hh
   LowTempRadiantSystem.cc
   LowTempRadiantSystem.hh
-  ManageElectricPower.cc
-  ManageElectricPower.hh
   MatrixDataManager.cc
   MatrixDataManager.hh
   MicroCHPElectricGenerator.cc
@@ -374,7 +374,6 @@ SET( SRC
   PhotovoltaicThermalCollectors.hh
   Photovoltaics.cc
   Photovoltaics.hh
-  PierceSurface.cc
   PierceSurface.hh
   PipeHeatTransfer.cc
   PipeHeatTransfer.hh
@@ -407,6 +406,7 @@ SET( SRC
   PlantUtilities.hh
   PlantValves.cc
   PlantValves.hh
+  Platform.hh
   PollutionModule.cc
   PollutionModule.hh
   PondGroundHeatExchanger.cc
@@ -441,6 +441,7 @@ SET( SRC
   ScheduleManager.hh
   SetPointManager.cc
   SetPointManager.hh
+  Shape.hh
   SimAirServingZones.cc
   SimAirServingZones.hh
   SimulationManager.cc
@@ -471,6 +472,8 @@ SET( SRC
   SurfaceGeometry.hh
   SurfaceGroundHeatExchanger.cc
   SurfaceGroundHeatExchanger.hh
+  SurfaceOctree.cc
+  SurfaceOctree.hh
   SwimmingPool.cc
   SwimmingPool.hh
   SystemAvailabilityManager.cc
