@@ -71,20 +71,15 @@
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 
-
 namespace EnergyPlus {
 
 namespace HVACFan {
 
 	int
-	getFanObjectVectorIndex(
-		std::string const objectName
-	);
+	getFanObjectVectorIndex( std::string const objectName );
 
 	bool
-	checkIfFanNameIsAFanSystem(
-		std::string const objectName
-	);
+	checkIfFanNameIsAFanSystem( std::string const objectName );
 
 class FanSystem
 {
@@ -92,9 +87,14 @@ class FanSystem
 public: // Methods
 
 	// Constructor
-	FanSystem(
-		std::string const objectName
-	);
+	FanSystem( std::string const objectName );
+
+	//Destructor
+	~FanSystem()
+	{}
+
+	// Copy Constructor
+	FanSystem( FanSystem const & ) = default;
 
 	void
 	simulate(
@@ -130,9 +130,7 @@ public: // Methods
 	getFanDesignTemperatureRise() const;
 
 	Real64 
-	getFanDesignHeatGain(
-		Real64 const FanVolFlow // fan volume flow rate [m3/s]
-	);
+	getFanDesignHeatGain( Real64 const FanVolFlow );
 
 	bool
 	getIfContinuousSpeedControl() const;
@@ -159,19 +157,19 @@ private: //methods
 
 private: // data
 
-	enum speedControlMethodEnum {
-		speedControlNotSet,
-		speedControlDiscrete,
-		speedControlContinuous
+	enum class SpeedControlMethod : int {
+		notSet = 0,
+		discrete,
+		continuous
 	};
-	enum powerSizingMethodEnum {
-		powerSizingMethodNotSet,
+	enum class PowerSizingMethod : int {
+		powerSizingMethodNotSet = 0,
 		powerPerFlow,
 		powerPerFlowPerPressure,
 		totalEfficiencyAndPressure
 	};
-	enum thermalLossDestinationEnum {
-		heatLossNotDetermined,
+	enum class ThermalLossDestination : int {
+		heatLossNotDetermined = 0,
 		zoneGains,
 		lostToOutside
 	};
@@ -184,14 +182,14 @@ private: // data
 	int outletNodeNum_; // system air node at fan outlet
 	Real64 designAirVolFlowRate_; // Max Specified Volume Flow Rate of Fan [m3/sec]
 	bool designAirVolFlowRateWasAutosized_; // true if design max volume flow rate was autosize on input
-	speedControlMethodEnum speedControl_; // Discrete or Continuous speed control method
+	SpeedControlMethod speedControl_; // Discrete or Continuous speed control method
 	Real64 minPowerFlowFrac_; // Minimum fan air flow fraction for power calculation
 	Real64 deltaPress_; // Delta Pressure Across the Fan [N/m2]
 	Real64 motorEff_; // Fan motor efficiency
 	Real64 motorInAirFrac_; // Fraction of motor heat entering air stream
 	Real64 designElecPower_; // design electric power consumption [W]
 	bool designElecPowerWasAutosized_;
-	powerSizingMethodEnum powerSizingMethod_; // sizing method for design electric power, three options
+	PowerSizingMethod powerSizingMethod_; // sizing method for design electric power, three options
 	Real64 elecPowerPerFlowRate_; // scaling factor for powerPerFlow method
 	Real64 elecPowerPerFlowRatePerPressure_; // scaling factor for powerPerFlowPerPressure
 	Real64 fanTotalEff_; // Fan total system efficiency (fan*belt*motor*VFD)
@@ -200,7 +198,7 @@ private: // data
 	Real64 nightVentFlowFraction_; // fan flow fraction during night ventilation mode
 	int zoneNum_; // zone index for motor heat losses as internal gains
 	Real64 zoneRadFract_; // thermal radiation split for motor losses
-	thermalLossDestinationEnum heatLossesDestination_; //enum for where motor loss go
+	ThermalLossDestination heatLossesDestination_; //enum for where motor loss go
 	std::string endUseSubcategoryName_;
 	int numSpeeds_; // input for how many speed levels for discrete fan
 	std::vector< Real64 > flowFractionAtSpeed_; //array of flow fractions for speed levels
@@ -253,7 +251,7 @@ private: // data
 
 }; //class FanSystem 
 
-extern std::vector< std::unique_ptr<FanSystem> > fanObjs;
+extern std::vector< std::unique_ptr< FanSystem > > fanObjs;
 
 } // Fan namespace
 

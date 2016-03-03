@@ -241,15 +241,15 @@ namespace HVACFan {
 			switch ( powerSizingMethod_ )
 			{
 		
-			case powerPerFlow: {
+			case PowerSizingMethod::powerPerFlow: {
 				designElecPower_ = designAirVolFlowRate_ * elecPowerPerFlowRate_;
 				break;
 			}
-			case powerPerFlowPerPressure: {
+			case PowerSizingMethod::powerPerFlowPerPressure: {
 				designElecPower_ = designAirVolFlowRate_ * deltaPress_ * elecPowerPerFlowRatePerPressure_;
 				break;
 			}
-			case totalEfficiencyAndPressure: {
+			case PowerSizingMethod::totalEfficiencyAndPressure: {
 				designElecPower_ = designAirVolFlowRate_ * deltaPress_ / fanTotalEff_;
 				break;
 			}
@@ -303,14 +303,14 @@ namespace HVACFan {
 		outletNodeNum_( 0 ),
 		designAirVolFlowRate_( 0.0 ),
 		designAirVolFlowRateWasAutosized_( false),
-		speedControl_( speedControlNotSet ), 
+		speedControl_( SpeedControlMethod::notSet ), 
 		minPowerFlowFrac_( 0.0 ),
 		deltaPress_( 0.0 ),
 		motorEff_( 0.0 ),
 		motorInAirFrac_( 0.0 ),
 		designElecPower_( 0.0 ),
 		designElecPowerWasAutosized_( false),
-		powerSizingMethod_( powerSizingMethodNotSet),
+		powerSizingMethod_( PowerSizingMethod::powerSizingMethodNotSet),
 		elecPowerPerFlowRate_( 0.0 ),
 		elecPowerPerFlowRatePerPressure_( 0.0 ),
 		fanTotalEff_( 0.0 ),
@@ -319,8 +319,7 @@ namespace HVACFan {
 		nightVentFlowFraction_( 0.0 ),
 		zoneNum_( 0 ),
 		zoneRadFract_( 0.0 ),
-		heatLossesDestination_( heatLossNotDetermined ),
-		endUseSubcategoryName_( "" ),
+		heatLossesDestination_( ThermalLossDestination::heatLossNotDetermined ),
 		numSpeeds_( 0 ),
 		inletAirMassFlowRate_( 0.0 ),
 		outletAirMassFlowRate_( 0.0 ),
@@ -391,11 +390,11 @@ namespace HVACFan {
 		}
 
 		if ( DataIPShortCuts::lAlphaFieldBlanks( 5 ) ) {
-			speedControl_ = speedControlDiscrete;
+			speedControl_ = SpeedControlMethod::discrete;
 		} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 5 ), "Continuous") ) {
-			speedControl_ = speedControlContinuous;
+			speedControl_ = SpeedControlMethod::continuous;
 		} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 5 ), "Discrete")  ) {
-			speedControl_ = speedControlDiscrete;
+			speedControl_ = SpeedControlMethod::discrete;
 		} else {
 			ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 			ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 5 ) + " = " + DataIPShortCuts::cAlphaArgs( 5 ) );
@@ -412,13 +411,13 @@ namespace HVACFan {
 		}
 		if ( designElecPowerWasAutosized_ ) {
 			if ( DataIPShortCuts::lAlphaFieldBlanks( 6 ) ) {
-				powerSizingMethod_ = powerPerFlowPerPressure;
+				powerSizingMethod_ = PowerSizingMethod::powerPerFlowPerPressure;
 			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "PowerPerFlow" ) ) {
-				powerSizingMethod_ = powerPerFlow;
+				powerSizingMethod_ = PowerSizingMethod::powerPerFlow;
 			} else if ( InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "PowerPerFlowPerPressure" ) ) {
-				powerSizingMethod_ = powerPerFlowPerPressure;
+				powerSizingMethod_ = PowerSizingMethod::powerPerFlowPerPressure;
 			} else if (  InputProcessor::SameString( DataIPShortCuts::cAlphaArgs( 6 ), "TotalEfficiencyAndPressure" ) ) {
-				powerSizingMethod_ = totalEfficiencyAndPressure;
+				powerSizingMethod_ = PowerSizingMethod::totalEfficiencyAndPressure;
 			} else {
 				ShowSevereError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 				ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 6 ) + " = " + DataIPShortCuts::cAlphaArgs( 6 ) );
@@ -434,12 +433,12 @@ namespace HVACFan {
 		 nightVentPressureDelta_       = DataIPShortCuts::rNumericArgs( 10 );
 		 nightVentFlowFraction_        = DataIPShortCuts::rNumericArgs( 11 );
 		zoneNum_ = InputProcessor::FindItemInList( DataIPShortCuts::cAlphaArgs( 8 ), DataHeatBalance::Zone );
-		if ( zoneNum_ > 0 ) heatLossesDestination_ = zoneGains;
+		if ( zoneNum_ > 0 ) heatLossesDestination_ = ThermalLossDestination::zoneGains;
 		if ( zoneNum_ == 0 ) {
 			if ( DataIPShortCuts::lAlphaFieldBlanks( 8 ) ) {
-				heatLossesDestination_ = lostToOutside;
+				heatLossesDestination_ = ThermalLossDestination::lostToOutside;
 			} else {
-				heatLossesDestination_ = lostToOutside;
+				heatLossesDestination_ = ThermalLossDestination::lostToOutside;
 				ShowWarningError( routineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs( 1 ) + "\", invalid entry." );
 				ShowContinueError( "Invalid " + DataIPShortCuts::cAlphaFieldNames( 8 ) + " = " + DataIPShortCuts::cAlphaArgs( 8 ) );
 				ShowContinueError( "Zone name not found. Fan motor heat losses will not be added to a zone" );
@@ -459,7 +458,7 @@ namespace HVACFan {
 			numSpeeds_ =  1;
 		}
 		fanRunTimeFractionAtSpeed_.resize( numSpeeds_, 0.0 );
-		if ( speedControl_ == speedControlDiscrete && numSpeeds_ > 1 ) {
+		if ( speedControl_ == SpeedControlMethod::discrete && numSpeeds_ > 1 ) {
 			//should have field sets 
 			flowFractionAtSpeed_.resize( numSpeeds_, 0.0 );
 			powerFractionAtSpeed_.resize( numSpeeds_, 0.0 );
@@ -495,7 +494,7 @@ namespace HVACFan {
 		}
 
 		// check if power curve present when any speeds have no power fraction 
-		if ( speedControl_ == speedControlDiscrete && numSpeeds_ > 1 && powerModFuncFlowFractionCurveIndex_ == 0 ) {
+		if ( speedControl_ == SpeedControlMethod::discrete && numSpeeds_ > 1 && powerModFuncFlowFractionCurveIndex_ == 0 ) {
 			bool foundMissingPowerFraction = false;
 			for ( auto loop = 0 ; loop< numSpeeds_; ++loop ) {
 				if ( ! powerFractionInputAtSpeed_[ loop ] ) {
@@ -517,9 +516,9 @@ namespace HVACFan {
 		SetupOutputVariable( "Fan Electric Power [W]", fanPower_, "System", "Average", name_ );
 		SetupOutputVariable( "Fan Rise in Air Temperature [deltaC]", deltaTemp_, "System", "Average", name_ );
 		SetupOutputVariable( "Fan Electric Energy [J]", fanEnergy_, "System", "Sum", name_, _, "Electric", "Fans", endUseSubcategoryName_, "System" );
-		if ( speedControl_ == speedControlDiscrete && numSpeeds_ == 1 ) {
+		if ( speedControl_ == SpeedControlMethod::discrete && numSpeeds_ == 1 ) {
 			SetupOutputVariable( "Fan Runtime Fraction []", fanRunTimeFractionAtSpeed_[ 0 ], "System", "Average", name_ );
-		} else if ( speedControl_ == speedControlDiscrete && numSpeeds_ > 1 ) {
+		} else if ( speedControl_ == SpeedControlMethod::discrete && numSpeeds_ > 1 ) {
 			for (auto speedLoop = 0; speedLoop < numSpeeds_; ++speedLoop) {
 				SetupOutputVariable( "Fan Runtime Fraction Speed " + General::TrimSigDigits( speedLoop + 1 ) + " []", fanRunTimeFractionAtSpeed_[ speedLoop ], "System", "Average", name_ );
 			}
@@ -590,7 +589,7 @@ namespace HVACFan {
 
 			switch ( speedControl_ ) {
 			
-			case speedControlDiscrete: {
+			case SpeedControlMethod::discrete: {
 				if ( numSpeeds_ == 1 ) { // CV or OnOff
 					localFanTotEff = fanTotalEff_;
 					fanRunTimeFractionAtSpeed_[ 0 ] = localFlowFraction;
@@ -636,7 +635,7 @@ namespace HVACFan {
 				localFanTotEff = fanTotalEff_;
 				break;
 			}
-			case speedControlContinuous: {
+			case SpeedControlMethod::continuous : {
 				localFanTotEff = fanTotalEff_;
 				Real64 localFlowFractionForPower = max( minPowerFlowFrac_, localFlowFraction );
 				Real64 localPowerFraction = CurveManager::CurveValue( powerModFuncFlowFractionCurveIndex_, localFlowFractionForPower );
@@ -717,7 +716,7 @@ namespace HVACFan {
 			DataLoopNode::Node( outletNodeNum_ ).GenContam = DataLoopNode::Node( inletNodeNum_ ).GenContam;
 		}
 
-		if ( heatLossesDestination_ == zoneGains ) {
+		if ( heatLossesDestination_ == ThermalLossDestination::zoneGains ) {
 	//TODO	
 		
 		}
@@ -812,7 +811,7 @@ namespace HVACFan {
 	bool
 	FanSystem::getIfContinuousSpeedControl() const 
 	{
-		if (speedControl_ == speedControlContinuous ) {
+		if (speedControl_ == SpeedControlMethod::continuous ) {
 			return true;
 		} else {
 			return false;
