@@ -475,8 +475,8 @@ namespace UnitHeater {
 					UnitHeat( UnitHeatNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( UnitHeat( UnitHeatNum ).FanName ) ); // call constructor
 					UnitHeat( UnitHeatNum ).Fan_Index = HVACFan::getFanObjectVectorIndex( UnitHeat( UnitHeatNum ).FanName ); //zero-based
-					UnitHeat( UnitHeatNum ).FanOutletNode = HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->getFanOutletNode();
-					FanVolFlow =  HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->getFanDesignVolumeFlowRate();
+					UnitHeat( UnitHeatNum ).FanOutletNode = HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->outletNodeNum();
+					FanVolFlow =  HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->designAirVolFlowRate();
 					if ( FanVolFlow != AutoSize && UnitHeat( UnitHeatNum ).MaxAirVolFlow != AutoSize && FanVolFlow < UnitHeat( UnitHeatNum ).MaxAirVolFlow ) {
 						ShowSevereError( "Specified in " + CurrentModuleObject + " = " + UnitHeat( UnitHeatNum ).Name );
 						ShowContinueError( "...air flow rate (" + TrimSigDigits( FanVolFlow, 7 ) + ") in fan object " + UnitHeat( UnitHeatNum ).FanName + " is less than the unit heater maximum supply air flow rate (" + TrimSigDigits( UnitHeat( UnitHeatNum ).MaxAirVolFlow, 7 ) + ")." );
@@ -492,7 +492,7 @@ namespace UnitHeater {
 						ShowContinueError( "...this can lead to unexpected results where the fan flow rate is less than required." );
 					}
 
-					UnitHeat( UnitHeatNum ).FanAvailSchedPtr = HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->getFanAvailSchIndex();
+					UnitHeat( UnitHeatNum ).FanAvailSchedPtr = HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->availSchedIndex();
 				}
 			}
 

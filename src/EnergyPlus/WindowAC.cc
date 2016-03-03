@@ -490,7 +490,7 @@ namespace WindowAC {
 					WindAC( WindACNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( WindAC( WindACNum ).FanName ) ); // call constructor
 					WindAC( WindACNum ).FanIndex = HVACFan::getFanObjectVectorIndex( WindAC( WindACNum ).FanName );
-					FanVolFlow =  HVACFan::fanObjs[ WindAC( WindACNum ).FanIndex ]->getFanDesignVolumeFlowRate();
+					FanVolFlow =  HVACFan::fanObjs[ WindAC( WindACNum ).FanIndex ]->designAirVolFlowRate();
 					if ( FanVolFlow != AutoSize ) {
 						if ( FanVolFlow < WindAC( WindACNum ).MaxAirVolFlow ) {
 							ShowWarningError( "Air flow rate = " + TrimSigDigits( FanVolFlow, 7 ) + " in fan object " + WindAC( WindACNum ).FanName + " is less than the maximum supply air flow rate (" + TrimSigDigits( WindAC( WindACNum ).MaxAirVolFlow, 7 ) + ") in the " + CurrentModuleObject + " object." );
@@ -499,7 +499,7 @@ namespace WindowAC {
 							ErrorsFound = true;
 						}
 					}
-					WindAC( WindACNum ).FanAvailSchedPtr = HVACFan::fanObjs[ WindAC( WindACNum ).FanIndex ]->getFanAvailSchIndex();
+					WindAC( WindACNum ).FanAvailSchedPtr = HVACFan::fanObjs[ WindAC( WindACNum ).FanIndex ]->availSchedIndex();
 				} else {
 
 					GetFanType( WindAC( WindACNum ).FanName, WindAC( WindACNum ).FanType_Num, FanErrFlag, CurrentModuleObject, WindAC( WindACNum ).Name );

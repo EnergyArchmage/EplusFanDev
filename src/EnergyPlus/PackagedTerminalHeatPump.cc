@@ -830,11 +830,11 @@ namespace PackagedTerminalHeatPump {
 				PTUnit( PTUnitNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PTUnit( PTUnitNum ).FanName ) ); // call constructor
 				PTUnit( PTUnitNum ).FanIndex = HVACFan::getFanObjectVectorIndex( PTUnit( PTUnitNum ).FanName );
-				FanInletNodeNum  = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanInletNode();
-				FanOutletNodeNum = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanOutletNode();
-				FanVolFlow       = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanDesignVolumeFlowRate();
+				FanInletNodeNum  = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->inletNodeNum();
+				FanOutletNodeNum = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->outletNodeNum();
+				FanVolFlow       = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->designAirVolFlowRate();
 				PTUnit( PTUnitNum ).ActualFanVolFlowRate = FanVolFlow;
-				PTUnit( PTUnitNum ).FanAvailSchedPtr = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanAvailSchIndex();
+				PTUnit( PTUnitNum ).FanAvailSchedPtr = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->availSchedIndex();
 			} else {
 				errFlag = false;
 				GetFanType( PTUnit( PTUnitNum ).FanName, PTUnit( PTUnitNum ).FanType_Num, errFlag, CurrentModuleObject, PTUnit( PTUnitNum ).Name );
@@ -1465,11 +1465,11 @@ namespace PackagedTerminalHeatPump {
 				PTUnit( PTUnitNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 				HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PTUnit( PTUnitNum ).FanName ) ); // call constructor
 				PTUnit( PTUnitNum ).FanIndex = HVACFan::getFanObjectVectorIndex( PTUnit( PTUnitNum ).FanName );
-				FanInletNodeNum  = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanInletNode();
-				FanOutletNodeNum = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanOutletNode();
-				FanVolFlow       = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanDesignVolumeFlowRate();
+				FanInletNodeNum  = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->inletNodeNum();
+				FanOutletNodeNum = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->outletNodeNum();
+				FanVolFlow       = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->designAirVolFlowRate();
 				PTUnit( PTUnitNum ).ActualFanVolFlowRate = FanVolFlow;
-				PTUnit( PTUnitNum ).FanAvailSchedPtr = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanAvailSchIndex();
+				PTUnit( PTUnitNum ).FanAvailSchedPtr = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->availSchedIndex();
 			} else {
 
 				// Get the fan's availability schedule
@@ -1968,11 +1968,11 @@ namespace PackagedTerminalHeatPump {
 					PTUnit( PTUnitNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem ( PTUnit( PTUnitNum ).FanName ) ); // call constructor
 					PTUnit( PTUnitNum ).FanIndex = HVACFan::getFanObjectVectorIndex( PTUnit( PTUnitNum ).FanName );
-					FanInletNodeNum  = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanInletNode();
-					FanOutletNodeNum = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanOutletNode();
-					FanVolFlow       = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanDesignVolumeFlowRate();
+					FanInletNodeNum  = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->inletNodeNum();
+					FanOutletNodeNum = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->outletNodeNum();
+					FanVolFlow       = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->designAirVolFlowRate();
 					PTUnit( PTUnitNum ).ActualFanVolFlowRate = FanVolFlow;
-					PTUnit( PTUnitNum ).FanAvailSchedPtr = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanAvailSchIndex();
+					PTUnit( PTUnitNum ).FanAvailSchedPtr = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->availSchedIndex();
 				} else {
 					errFlag = false;
 					GetFanType( PTUnit( PTUnitNum ).FanName, PTUnit( PTUnitNum ).FanType_Num, errFlag, CurrentModuleObject, Alphas( 1 ) );
@@ -3071,7 +3071,7 @@ namespace PackagedTerminalHeatPump {
 				MyFanFlag( PTUnitNum ) = false;
 			} else {
 				if ( PTUnit( PTUnitNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-					PTUnit( PTUnitNum ).ActualFanVolFlowRate = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanDesignVolumeFlowRate();
+					PTUnit( PTUnitNum ).ActualFanVolFlowRate = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->designAirVolFlowRate();
 				} else {
 					GetFanVolFlow( PTUnit( PTUnitNum ).FanIndex, PTUnit( PTUnitNum ).ActualFanVolFlowRate );
 				}
@@ -3124,7 +3124,7 @@ namespace PackagedTerminalHeatPump {
 			if ( PTUnit( PTUnitNum ).CheckFanFlow ) {
 				CurrentModuleObject = "ZoneHVAC:PackagedTerminalHeatPump";
 				if ( PTUnit( PTUnitNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
-					PTUnit( PTUnitNum ).FanVolFlow  = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->getFanDesignVolumeFlowRate();
+					PTUnit( PTUnitNum ).FanVolFlow  = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->designAirVolFlowRate();
 				} else {
 					GetFanVolFlow( PTUnit( PTUnitNum ).FanIndex, PTUnit( PTUnitNum ).FanVolFlow );
 				}

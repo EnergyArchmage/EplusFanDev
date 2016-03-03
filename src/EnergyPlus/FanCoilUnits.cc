@@ -698,7 +698,7 @@ namespace FanCoilUnits {
 					FanCoil( FanCoilNum ).FanType_Num   = DataHVACGlobals::FanType_SystemModelObject;
 					HVACFan::fanObjs.emplace_back( new HVACFan::FanSystem  ( FanCoil( FanCoilNum ).FanName ) ); // call constructor
 					FanCoil( FanCoilNum ).FanIndex      = HVACFan::getFanObjectVectorIndex( FanCoil( FanCoilNum ).FanName ); //zero-based
-					FanCoil( FanCoilNum ).FanAirVolFlow = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->getFanDesignVolumeFlowRate();
+					FanCoil( FanCoilNum ).FanAirVolFlow = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->designAirVolFlowRate();
 					// Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
 					if ( FanCoil( FanCoilNum ).MaxAirVolFlow > FanCoil( FanCoilNum ).FanAirVolFlow && FanCoil( FanCoilNum ).FanAirVolFlow != AutoSize ) {
 						ShowWarningError( RoutineName + FanCoil( FanCoilNum ).UnitType + ": " + FanCoil( FanCoilNum ).Name );
@@ -1430,7 +1430,7 @@ namespace FanCoilUnits {
 						FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 					} else {
 						HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate(_,_,_,_);
-						FanCoil( FanCoilNum ).FanAirVolFlow = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->getFanDesignVolumeFlowRate();
+						FanCoil( FanCoilNum ).FanAirVolFlow = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->designAirVolFlowRate();
 					}
 				}
 				//     Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
@@ -1467,7 +1467,7 @@ namespace FanCoilUnits {
 				FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 			} else {
 				HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate(_,_,_,_);
-				FanCoil( FanCoilNum ).FanAirVolFlow = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->getFanDesignVolumeFlowRate();
+				FanCoil( FanCoilNum ).FanAirVolFlow = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->designAirVolFlowRate();
 			}
 			//   Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
 			if  ( FanCoil( FanCoilNum ).MaxAirVolFlow > FanCoil( FanCoilNum ).FanAirVolFlow ) {
