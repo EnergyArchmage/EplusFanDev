@@ -2553,7 +2553,7 @@ namespace Fans {
 
 		Fan( FanNum ).FanEnergy = Fan( FanNum ).FanPower * TimeStepSys * SecInHour;
 		Fan( FanNum ).DeltaTemp = Fan( FanNum ).OutletAirTemp - Fan( FanNum ).InletAirTemp;
-		FanElecPower = Fan( FanNum ).FanPower;
+		FanElecPower = Fan( FanNum ).FanPower; // ugly global here
 
 		if ( Fan( FanNum ).FanType_Num == FanType_SimpleOnOff ) {
 			LoopOnOffFanRTF = Fan( FanNum ).FanRuntimeFraction;
@@ -2675,11 +2675,8 @@ namespace Fans {
 
 	}
 
-	void
-	GetFanPower(
-		int const FanIndex,
-		Real64 & FanPower
-	)
+	Real64
+	GetFanPower( int const FanIndex )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -2716,9 +2713,9 @@ namespace Fans {
 		// na
 
 		if ( FanIndex == 0 ) {
-			FanPower = 0.0;
+			return 0.0;
 		} else {
-			FanPower = Fan( FanIndex ).FanPower;
+			return Fan( FanIndex ).FanPower;
 		}
 
 	}

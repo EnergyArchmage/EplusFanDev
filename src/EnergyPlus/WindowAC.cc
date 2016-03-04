@@ -1224,7 +1224,7 @@ namespace WindowAC {
 		WindAC( WindACNum ).TotCoolEnergyRate = std::abs( min( 0.0, QTotUnitOut ) );
 		WindAC( WindACNum ).SensCoolEnergyRate = min( WindAC( WindACNum ).SensCoolEnergyRate, WindAC( WindACNum ).TotCoolEnergyRate );
 		WindAC( WindACNum ).LatCoolEnergyRate = WindAC( WindACNum ).TotCoolEnergyRate - WindAC( WindACNum ).SensCoolEnergyRate;
-		WindAC( WindACNum ).ElecPower = FanElecPower + DXElecCoolingPower;
+		WindAC( WindACNum ).ElecPower = FanElecPower + DXElecCoolingPower; // ugly global here
 
 		PowerMet = QUnitOut;
 		LatOutputProvided = LatentOutput;

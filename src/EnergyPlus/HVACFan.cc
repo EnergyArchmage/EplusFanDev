@@ -721,8 +721,8 @@ namespace HVACFan {
 		
 		}
 
-		//ugly use of global here
-		DataHVACGlobals::FanElecPower = fanPower_;
+		//ugly use of global here in old fans, use getter now
+	//	DataHVACGlobals::FanElecPower = fanPower_;
 		DataAirLoop::LoopOnOffFanRTF  = fanRunTimeFractionAtSpeed_[ numSpeeds_ - 1 ]; //fill with RTF from highest speed level
 
 	}

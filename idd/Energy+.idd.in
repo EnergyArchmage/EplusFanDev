@@ -33367,12 +33367,12 @@ ZoneHVAC:EnergyRecoveryVentilator,
         \note This flow rate must match the supply fan air flow rate.
   A4 ,  \field Supply Air Fan Name
         \required-field
-        \note Fan type must be Fan:OnOff
+        \note Fan type must be Fan:OnOff or Fan:SystemModel
         \type object-list
         \object-list FansOnOff
   A5 ,  \field Exhaust Air Fan Name
         \required-field
-        \note Fan type must be Fan:OnOff
+        \note Fan type must be Fan:OnOff or Fan:SystemModel
         \type object-list
         \object-list FansOnOff
   A6 ,  \field Controller Name

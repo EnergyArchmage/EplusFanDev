@@ -12192,7 +12192,7 @@ Label50: ;
 
 				SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
 				FanHeatCorrection = Node( FanOutletNode ).Enthalpy - Node( FanInletNode ).Enthalpy;
-				GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex, FanPowerCorrection );
+				FanPowerCorrection = GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex);
 
 				NetCoolingCapRated = DXCoil( DXCoilNum ).RatedTotCap( 1 ) * TotCapTempModFac * TotCapFlowModFac - FanHeatCorrection;
 			}
@@ -12316,7 +12316,7 @@ Label50: ;
 					Node( FanInletNode ).Enthalpy = PsyHFnTdbW( CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat );
 					SimulateFanComponents( DXCoil( DXCoilNum ).SupplyFanName, true, DXCoil( DXCoilNum ).SupplyFanIndex, _, true, false, FanStaticPressureRise );
 					FanHeatCorrection = Node( FanOutletNode ).Enthalpy - Node( FanInletNode ).Enthalpy;
-					GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex, FanPowerCorrection );
+					FanPowerCorrection = GetFanPower( DXCoil( DXCoilNum ).SupplyFanIndex );
 
 				} else {
 					FanPowerCorrection = FanPowerPerEvapAirFlowRate * PartLoadAirMassFlowRate;
