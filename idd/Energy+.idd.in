@@ -51959,6 +51959,7 @@ AirLoopHVAC:UnitarySystem,
        \note Enter the node name used as the outlet air node for the unitary system.
   A8, \field Supply Fan Object Type
        \type choice
+       \key Fan:SystemModel
        \key Fan:OnOff
        \key Fan:ConstantVolume
        \key Fan:VariableVolume
@@ -51966,9 +51967,9 @@ AirLoopHVAC:UnitarySystem,
        \note Enter the type of supply air fan if included in the unitary system.
        \note Fan:ConstantVolume only works with continuous fan operating mode (i.e. supply
        \note air fan operating mode schedule values greater than 0).
-       \note Specify a Fan:OnOff object when the Supply Air Fan Operating Mode Schedule Name
+       \note Specify a Fan:SystemModel or a Fan:OnOff object when the Supply Air Fan Operating Mode Schedule Name
        \note input field above is left blank.
-       \note Specify a Fan:VariableVolume when modeling VAV systems which used setpoint based control
+       \note Specify a Fan:SystemModel or a Fan:VariableVolume when modeling VAV systems which used setpoint based control
        \note if the fan is included in the unitary system object.
        \note The ComponentModel fan type may be substituted for the ConstantVolume or VariableVolume
        \note fan types when more detailed fan modeling is required.

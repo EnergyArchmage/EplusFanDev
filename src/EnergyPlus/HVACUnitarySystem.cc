@@ -87,6 +87,7 @@
 #include <DXCoils.hh>
 #include <EMSManager.hh>
 #include <Fans.hh>
+#include <HVACFan.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
@@ -3159,10 +3160,18 @@ namespace HVACUnitarySystem {
 			FanName = Alphas( iFanNameAlphaNum );
 
 			if ( ! lAlphaBlanks( iFanTypeAlphaNum ) ) {
-				IsNotOK = false;
-				GetFanType( FanName, UnitarySystem( UnitarySysNum ).FanType_Num, IsNotOK, CurrentModuleObject, Alphas( iNameAlphaNum ) );
-				if ( IsNotOK ) {
-					ErrorsFound = true;
+				if ( SameString( FanType, "Fan:SystemModel" ) ) {
+					if ( ! HVACFan::checkIfFanNameIsAFanSystem( FanName ) ) {
+						ErrorsFound = true;
+					} else {
+						UnitarySystem( UnitarySysNum ).FanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+					}
+				} else {
+					IsNotOK = false;
+					GetFanType( FanName, UnitarySystem( UnitarySysNum ).FanType_Num, IsNotOK, CurrentModuleObject, Alphas( iNameAlphaNum ) );
+					if ( IsNotOK ) {
+						ErrorsFound = true;
+					}
 				}
 				UnitarySystem( UnitarySysNum ).FanExists = true;
 			}
@@ -3220,6 +3229,18 @@ namespace HVACUnitarySystem {
 					}
 
 				} // IF (IsNotOK) THEN
+
+			} else if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+				IsNotOK = false;
+				ValidateComponent( FanType, FanName, IsNotOK, CurrentModuleObject );
+				if ( IsNotOK ) {
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+					ErrorsFound = true;
+				} else { // mine data from fan object
+					UnitarySystem( UnitarySysNum ).FanIndex = 
+					FanVolFlowRate = 
+				}
+
 
 			} else if ( UnitarySystem( UnitarySysNum ).FanExists ) {
 				ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );

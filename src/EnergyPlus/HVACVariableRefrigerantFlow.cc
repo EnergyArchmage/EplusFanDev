@@ -2638,7 +2638,11 @@ namespace HVACVariableRefrigerantFlow {
 			FanType = cAlphaArgs( 7 );
 			FanName = cAlphaArgs( 8 );
 			if ( SameString( FanType, "Fan:SystemModel" ) ) {
-				VRFTU( VRFTUNum ).fanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+				if ( ! HVACFan::checkIfFanNameIsAFanSystem( FanName ) ) {
+					ErrorsFound = true;
+				} else {
+					VRFTU( VRFTUNum ).fanType_Num = DataHVACGlobals::FanType_SystemModelObject;
+				}
 			} else {
 				errFlag = false;
 				GetFanType( FanName, VRFTU( VRFTUNum ).fanType_Num, errFlag, cCurrentModuleObject );
