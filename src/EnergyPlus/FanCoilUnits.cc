@@ -3044,7 +3044,9 @@ namespace FanCoilUnits {
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 				SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
-				
+				// FanFlowRatio need to be accurate here for new fan model
+
+
 				HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( FanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff ,_ );
 			}
 			if ( FanCoil( FanCoilNum ).CCoilType_Num == CCoil_HXAssist ) {
