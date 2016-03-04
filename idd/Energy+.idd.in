@@ -34067,14 +34067,13 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
         \note Select fan placement as either blow through or draw through.
   A7 ,  \field Supply Air Fan Object Type
         \type choice
+        \key Fan:SystemModel
         \key Fan:OnOff
         \key Fan:ConstantVolume
         \key Fan:VariableVolume
-        \note Supply Air Fan Object Type must be
-        \note Fan:OnOff or Fan:ConstantVolume
-        \note if AirConditioner:VariableRefrigerantFlow
-        \note is used to model VRF outdoor unit
-        \note Supply Air Fan Object Type must be Fan:VariableVolume if
+        \note Supply Air Fan Object Type must be Fan:SystemModel, Fan:OnOff, or Fan:ConstantVolume
+        \note if AirConditioner:VariableRefrigerantFlow is used to model VRF outdoor unit
+        \note Supply Air Fan Object Type must be Fan:SystemModel or Fan:VariableVolume if
         \note AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl
         \note is used to model VRF outdoor unit
         \default Fan:ConstantVolume

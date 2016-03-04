@@ -10310,8 +10310,6 @@ NodeList,
     ERV Outdoor air Inlet Node; !- Node_ID_1
 
 
-
-
 ZoneHVAC:EquipmentConnections,
     RESISTIVE ZONE,      !- Zone Name
     Zone1Equipment,      !- List Name: Zone Equipment
@@ -10323,7 +10321,7 @@ ZoneHVAC:EquipmentConnections,
 
 ZoneHVAC:EquipmentList,
     Zone1Equipment,                          !-Name
-ZoneHVAC:EnergyRecoveryVentilator,  !- KEY--Zone Equipment Type 1
+    ZoneHVAC:EnergyRecoveryVentilator,  !- KEY--Zone Equipment Type 1
     Stand Alone ERV 1,                       !- Type Name 1
     1,                                       !- Cooling Priority
     1;                                       !- Heating Priority
@@ -10349,8 +10347,6 @@ ZoneHVAC:EnergyRecoveryVentilator:Controller,
     NoExhaustAirEnthalpyLimit; !- Exhaust air enthalpy limit
 
 
-
-
 HeatExchanger:AirToAir:SensibleAndLatent,
     OA Heat Recovery 1,            !- Heat exchanger name
     FanAndCoilAvailSched,          !- Availability schedule name
@@ -10374,30 +10370,40 @@ HeatExchanger:AirToAir:SensibleAndLatent,
     1.7;                           !- Threshold temperature
 
 
+Fan:SystemModel,
+    Stand Alone ERV Supply Fan , !- Name
+    FanAndCoilAvailSched , !- Availability Schedule Name
+    Heat Recovery Outlet Node,  !- Air Inlet Node Name
+    Stand Alone ERV Supply Fan Outlet Node , !- Air Outlet Node Name
+    0.06 , !- Design Maximum Air Flow Rate
+    Discrete , !- Speed Control Method
+    0.0, !- Electric Power Minimum Flow Rate Fraction
+    75.0, !- Design Pressure Rise
+    0.9 , !- Motor Efficiency
+    1.0 , !- Motor In Air Stream Fraction
+    AUTOSIZE, !- Design Electric Power Consumption
+    TotalEfficiencyAndPressure, !- Design Power Sizing Method
+    , !- Electric Power Per Unit Flow Rate
+    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+    0.50;  !- Fan Total Efficiency 
 
 
-Fan:OnOff,
-    Stand Alone ERV Supply Fan,               !- Fan Name
-    FanAndCoilAvailSched,                     !- Availability Schedule Name
-    0.5,                                      !- Fan Total Efficiency
-    75.0,                                     !- Delta Pressure {Pa}
-    0.05,                                     !- Max Flow Rate {m3/s}
-    0.9,                                      !- Motor Efficiency
-    1.0,                                      !- Motor In Airstream Fraction
-    Heat Recovery Outlet Node,                !- Fan_Inlet_Node
-    Stand Alone ERV Supply Fan Outlet Node;   !- Fan_Outlet_Node
-
-
-Fan:OnOff,
-    Stand Alone ERV Exhaust Fan,              !- Fan Name
-    FanAndCoilAvailSched,                     !- Availability Schedule Name
-    0.5,                                      !- Fan Total Efficiency
-    75.0,                                     !- Delta Pressure {Pa}
-    0.05,                                     !- Max Flow Rate {m3/s}
-    0.9,                                      !- Motor Efficiency
-    1.0,                                      !- Motor In Airstream Fraction
-    Heat Recovery Secondary Outlet Node,      !- Fan_Inlet_Node
-    Stand Alone ERV Exhaust Fan Outlet Node;  !- Fan_Outlet_Node
+Fan:SystemModel,
+    Stand Alone ERV Exhaust Fan , !- Name
+    FanAndCoilAvailSched , !- Availability Schedule Name
+    Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name
+    Stand Alone ERV Exhaust Fan Outlet Node,  !- Air Outlet Node Name
+    0.06 , !- Design Maximum Air Flow Rate
+    Discrete , !- Speed Control Method
+    0.0, !- Electric Power Minimum Flow Rate Fraction
+    75.0, !- Design Pressure Rise
+    0.9 , !- Motor Efficiency
+    1.0 , !- Motor In Air Stream Fraction
+    AUTOSIZE, !- Design Electric Power Consumption
+    TotalEfficiencyAndPressure, !- Design Power Sizing Method
+    , !- Electric Power Per Unit Flow Rate
+    , !- Electric Power Per Unit Flow Rate Per Unit Pressure
+    0.50;  !- Fan Total Efficiency 
 
 
 SetpointManager:Scheduled,
@@ -10569,7 +10575,9 @@ The second choice stands for “draw through fan”. This means that the unit co
 
 #### Field: Supply Air Fan Object Type
 
-This choice field contains the identifying type of supply air fan specified for the furnace. Fan type must be **Fan:OnOff** or **Fan:ConstantVolume**. Fan:ConstantVolume is used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff is used when the fan cycles on and off with the cooling or heating coil (i.e. Supply Air Fan Operating Mode Schedule values are at times 0).
+This choice field contains the identifying type of supply air fan specified for the furnace. Fan type must be **Fan:SystemModel**, **Fan:OnOff**, **Fan:ConstantVolume**, or **Fan:VariableVolume**.  Fan:SystemModel can always be used.  Fan:ConstantVolume can be used when the Supply Air Fan Operating Mode Schedule values are never 0 and the fan operates continuously. Fan:OnOff can be used when the fan cycles on and off with the cooling or heating coil (i.e. Supply Air Fan Operating Mode Schedule values are at times 0). 
+
+When the terminal unit is connected to a AirConditioner:VariableRefrigerantFlow:FluidTemperatureControl outdoor unit, then Fan:VariableVolume can be used.
 
 #### Field: Supply Air Fan Object Name
 
