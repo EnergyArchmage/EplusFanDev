@@ -137,7 +137,6 @@ namespace UnitVentilator {
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::ContFanCycCoil;
 	using DataHVACGlobals::CycFanCycCoil;
@@ -2175,8 +2174,6 @@ namespace UnitVentilator {
 
 		}}
 
-		// FLOW:
-		FanElecPower = 0.0;
 		// initialize local variables
 		ControlNode = 0;
 		QUnitOut = 0.0;
@@ -2660,7 +2657,11 @@ namespace UnitVentilator {
 		UnitVent( UnitVentNum ).HeatPower = max( 0.0, QUnitOut );
 		UnitVent( UnitVentNum ).SensCoolPower = std::abs( min( 0.0, QUnitOut ) );
 		UnitVent( UnitVentNum ).TotCoolPower = std::abs( min( 0.0, QTotUnitOut ) );
-		UnitVent( UnitVentNum ).ElecPower = FanElecPower;
+		if ( UnitVent( UnitVentNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+			UnitVent( UnitVentNum ).ElecPower = Fans::GetFanPower( UnitVent( UnitVentNum ).Fan_Index );
+		} else {
+			UnitVent( UnitVentNum ).ElecPower = HVACFan::fanObjs[ UnitVent( UnitVentNum ).Fan_Index ]->fanPower();
+		}
 
 		PowerMet = QUnitOut;
 		LatOutputProvided = LatentOutput;

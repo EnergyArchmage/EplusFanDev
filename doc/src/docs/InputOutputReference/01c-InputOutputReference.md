@@ -10188,7 +10188,7 @@ These outputs are the rate and volume of water removed as condensate by the dehu
 
 ### ZoneHVAC:EnergyRecoveryVentilator
 
-The ZoneHVAC:EnergyRecoveryVentilator - stand alone energy recovery ventilator (ERV) is a single-zone HVAC component used for exhaust air heat recovery (Figure 115). This compound object consists of 3 required components: a generic air-to-air heat exchanger (see object Heat Exchanger:Air to Air:Generic), a supply air fan, and an exhaust air fan (see object Fan:OnOff).
+The ZoneHVAC:EnergyRecoveryVentilator - stand alone energy recovery ventilator (ERV) is a single-zone HVAC component used for exhaust air heat recovery (Figure 115). This compound object consists of 3 required components: a generic air-to-air heat exchanger (see object Heat Exchanger:Air to Air:Generic), a supply air fan, and an exhaust air fan (see object Fan:SystemModel or Fan:OnOff).
 
 An optional controller (see object ZoneHVAC:EnergyRecoveryVentilator:Controller) may be used to simulate economizer (free cooling) operation, modify air flow rates based on high indoor humidity, or simulate a “push-button” type economizer controller.
 
@@ -10204,9 +10204,9 @@ To model a stand alone ERV connected to a single zone, the input data file shoul
 
 - HeatExchanger:AirToAir:SensibleAndLatent
 
-- Fan:OnOff (supply air)
+- Fan:SystemModel ( or Fan:OnOff) for supply air)
 
-- Fan:OnOff (exhaust air)
+- Fan:SystemModel ( or Fan:OnOff) for exhaust air
 
 - ZoneHVAC:EnergyRecoveryVentilator:Controller (if economizer [free cooling] mode or high humidity control operation is desired)
 
@@ -10262,11 +10262,11 @@ Note: The exhaust air inlet node specified in the generic heat exchanger object 
 
 #### Field: Supply Air Fan Name
 
-The name of the supply air fan used in this object. Fan type must be Fan:OnOff.
+The name of the supply air fan used in this object. Fan type must be a Fan:SystemModel or a Fan:OnOff.
 
 #### Field: Exhaust Air Fan Name
 
-The name of the exhaust air fan used in this object. Fan type must be Fan:OnOff.
+The name of the exhaust air fan used in this object. Fan type must be a Fan:SystemModel or a Fan:OnOff.
 
 #### Field: Controller Name
 

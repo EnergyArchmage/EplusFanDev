@@ -137,7 +137,6 @@ namespace WindowAC {
 	using DataEnvironment::StdRhoAir;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::DXElecCoolingPower;
 	using DataHVACGlobals::OnOffFanPartLoadFraction;
 	using DataHVACGlobals::SmallAirVolFlow;
@@ -1147,8 +1146,8 @@ namespace WindowAC {
 		Real64 SpecHumOut; // Specific humidity ratio of outlet air (kg moisture / kg moist air)
 		Real64 SpecHumIn; // Specific humidity ratio of inlet air (kg moisture / kg moist air)
 
-		// zero the fan and DX coil electricity consumption
-		FanElecPower = 0.0;
+		// zero the DX coil electricity consumption
+
 		DXElecCoolingPower = 0.0;
 		// initialize local variables
 		UnitOn = true;
@@ -1224,7 +1223,13 @@ namespace WindowAC {
 		WindAC( WindACNum ).TotCoolEnergyRate = std::abs( min( 0.0, QTotUnitOut ) );
 		WindAC( WindACNum ).SensCoolEnergyRate = min( WindAC( WindACNum ).SensCoolEnergyRate, WindAC( WindACNum ).TotCoolEnergyRate );
 		WindAC( WindACNum ).LatCoolEnergyRate = WindAC( WindACNum ).TotCoolEnergyRate - WindAC( WindACNum ).SensCoolEnergyRate;
-		WindAC( WindACNum ).ElecPower = FanElecPower + DXElecCoolingPower; // ugly global here
+		Real64 locFanElecPower = 0.0;
+		if ( WindAC( WindACNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+			locFanElecPower = Fans::GetFanPower( WindAC( WindACNum ).FanIndex );
+		} else {
+			locFanElecPower = HVACFan::fanObjs[ WindAC( WindACNum ).FanIndex ]->fanPower();
+		}
+		WindAC( WindACNum ).ElecPower = locFanElecPower + DXElecCoolingPower;
 
 		PowerMet = QUnitOut;
 		LatOutputProvided = LatentOutput;

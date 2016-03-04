@@ -178,8 +178,7 @@ namespace HVACFan {
 		}
 
 		if ( DataGlobals::BeginEnvrnFlag && objEnvrnFlag_ ) {
-			rhoAirStdInit_ = DataEnvironment::StdRhoAir;
-			maxAirMassFlowRate_ = designAirVolFlowRate_ * rhoAirStdInit_;
+
 			minAirFlowRate_ = designAirVolFlowRate_ * minPowerFlowFrac_;
 			minAirMassFlowRate_ = minAirFlowRate_ * rhoAirStdInit_;
 
@@ -260,6 +259,9 @@ namespace HVACFan {
 			ReportSizingManager::ReportSizingOutput( fanType_, name_, "Design Electric Power Consumption [W]", designElecPower_ );
 		
 		} // end if power was autosized
+
+		rhoAirStdInit_ = DataEnvironment::StdRhoAir;
+		maxAirMassFlowRate_ = designAirVolFlowRate_ * rhoAirStdInit_;
 
 		//calculate total fan system efficiency at design
 		fanTotalEff_ = designAirVolFlowRate_ * deltaPress_ / designElecPower_;
@@ -721,7 +723,7 @@ namespace HVACFan {
 		
 		}
 
-		//ugly use of global here in old fans, use getter now
+		//oold fan had ugly use of globals here, use getter now
 	//	DataHVACGlobals::FanElecPower = fanPower_;
 		DataAirLoop::LoopOnOffFanRTF  = fanRunTimeFractionAtSpeed_[ numSpeeds_ - 1 ]; //fill with RTF from highest speed level
 

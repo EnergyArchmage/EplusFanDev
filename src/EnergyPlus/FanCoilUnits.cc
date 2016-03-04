@@ -144,7 +144,7 @@ namespace FanCoilUnits {
 	using DataEnvironment::StdRhoAir;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::FanElecPower;
+//	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::SingleCoolingSetPoint;
 	using DataHVACGlobals::SingleHeatingSetPoint;
@@ -1933,8 +1933,6 @@ namespace FanCoilUnits {
 		Real64 MaxSAMassFlowRate; // maximum supply air mass flow rate [kg/s]
 		Real64 FCOutletTempOn; // ASHRAE outlet air temperature when coil is on [C]
 
-		// FLOW
-		FanElecPower = 0.0;
 		// initialize local variables
 		UnitOn = true;
 		ControlNode = 0;
@@ -2049,7 +2047,7 @@ namespace FanCoilUnits {
 			FanCoil( FanCoilNum ).SensCoolPower = std::abs( min( constant_zero, QUnitOut ) );
 			FanCoil( FanCoilNum ).TotCoolPower = std::abs( min( constant_zero, QTotUnitOut ) );
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				FanCoil( FanCoilNum ).ElecPower = FanElecPower; // ugly global here
+				FanCoil( FanCoilNum ).ElecPower = Fans::GetFanPower( FanCoil( FanCoilNum ).FanIndex );
 			} else {
 				FanCoil( FanCoilNum ).ElecPower = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->fanPower();
 			}
@@ -2233,7 +2231,7 @@ namespace FanCoilUnits {
 			FanCoil( FanCoilNum ).SensCoolPower = std::abs( min( constant_zero, QUnitOut ) );
 			FanCoil( FanCoilNum ).TotCoolPower = std::abs( min( constant_zero, QTotUnitOut ) );
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				FanCoil( FanCoilNum ).ElecPower = FanElecPower; // ugly global here
+				FanCoil( FanCoilNum ).ElecPower = Fans::GetFanPower( FanCoil( FanCoilNum ).FanIndex );
 			} else {
 				FanCoil( FanCoilNum ).ElecPower = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->fanPower();
 			}
@@ -2725,7 +2723,7 @@ namespace FanCoilUnits {
 			FanCoil( FanCoilNum ).SensCoolPower = std::abs( min( constant_zero, QUnitOut ) );
 			FanCoil( FanCoilNum ).TotCoolPower = std::abs( min( constant_zero, QTotUnitOut ) );
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				FanCoil( FanCoilNum ).ElecPower = FanElecPower; // ugly global here
+				FanCoil( FanCoilNum ).ElecPower = Fans::GetFanPower( FanCoil( FanCoilNum ).FanIndex );
 			} else {
 				FanCoil( FanCoilNum ).ElecPower = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->fanPower();
 			}
@@ -2857,7 +2855,7 @@ namespace FanCoilUnits {
 			FanCoil( FanCoilNum ).SensCoolPower = std::abs( min( constant_zero, QSensUnitOutNoATM ) );
 			FanCoil( FanCoilNum ).TotCoolPower = std::abs( min( constant_zero, QTotUnitOut ) );
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				FanCoil( FanCoilNum ).ElecPower = FanElecPower; // ugly global here
+				FanCoil( FanCoilNum ).ElecPower = Fans::GetFanPower( FanCoil( FanCoilNum ).FanIndex );
 			} else {
 				FanCoil( FanCoilNum ).ElecPower = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->fanPower();
 			}
@@ -2879,7 +2877,7 @@ namespace FanCoilUnits {
 			FanCoil( FanCoilNum ).SensCoolPower = std::abs( min( constant_zero, QSensUnitOutNoATM ) );
 			FanCoil( FanCoilNum ).TotCoolPower = std::abs( min( constant_zero, QTotUnitOut ) );
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-				FanCoil( FanCoilNum ).ElecPower = FanElecPower; // ugly global here
+				FanCoil( FanCoilNum ).ElecPower = Fans::GetFanPower( FanCoil( FanCoilNum ).FanIndex );
 			} else {
 				FanCoil( FanCoilNum ).ElecPower = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->fanPower();
 			}
@@ -3046,6 +3044,7 @@ namespace FanCoilUnits {
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 				SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
+				
 				HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( FanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff ,_ );
 			}
 			if ( FanCoil( FanCoilNum ).CCoilType_Num == CCoil_HXAssist ) {
@@ -3165,7 +3164,6 @@ namespace FanCoilUnits {
 		// initialize local variables
 		UnitOn = true;
 		SpeedRatio = 0.0;
-		FanElecPower = 0.0; // ugly global here
 		PartLoadRatio = 0.0;
 		QZnReq = 0.0;
 		QUnitOut = 0.0;
@@ -3499,7 +3497,6 @@ namespace FanCoilUnits {
 		SRatio = 0.0;
 		QUnitOut = 0.0;
 		QUnitOutMax = 0.0;
-		FanElecPower = 0.0; // ugly global here
 		ControlOffset = 0.0;
 		FanElecPowerHS = 0.0;
 		FanElecPowerLS = 0.0;
@@ -3573,7 +3570,7 @@ namespace FanCoilUnits {
 				FanFlowRatio = LowSpeedRatio;
 				Calc4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMaxLS );
 				if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-					FanElecPowerLS = FanElecPower; // ugly global here
+					FanElecPowerLS = Fans::GetFanPower( FanCoil( FanCoilNum ).FanIndex );
 				} else {
 					FanElecPowerLS = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->fanPower();
 				}
@@ -3588,7 +3585,7 @@ namespace FanCoilUnits {
 				FanFlowRatio = HighSpeedRatio;
 				Calc4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMaxHS );
 				if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-					FanElecPowerHS = FanElecPower; // ugly global here
+					FanElecPowerHS = Fans::GetFanPower( FanCoil( FanCoilNum ).FanIndex );
 				} else {
 					FanElecPowerHS = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->fanPower();
 				}
@@ -3692,7 +3689,7 @@ namespace FanCoilUnits {
 				FanFlowRatio = LowSpeedRatio;
 				Calc4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMaxLS );
 				if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-					FanElecPowerLS = FanElecPower; // ugly global here
+					FanElecPowerLS = Fans::GetFanPower( FanCoil( FanCoilNum ).FanIndex );
 				} else {
 					FanElecPowerLS = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->fanPower();
 				}
@@ -3707,7 +3704,7 @@ namespace FanCoilUnits {
 				FanFlowRatio = HighSpeedRatio;
 				Calc4PipeFanCoil( FanCoilNum, ZoneNum, FirstHVACIteration, QUnitOutMaxHS );
 				if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
-					FanElecPowerHS = FanElecPower; // ugly global here
+					FanElecPowerHS = Fans::GetFanPower( FanCoil( FanCoilNum ).FanIndex );
 				} else {
 					FanElecPowerHS = HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->fanPower();
 				}
@@ -3752,7 +3749,7 @@ namespace FanCoilUnits {
 						if ( Iter > 70 && SRatio == 0.0 && DelPLR < 0.0 ) Error = 0.0;
 					}
 				}
-				//FanElecPower = FanElecPowerHS * SRatio + FanElecPowerLS * ( 1.0 - SRatio ); // why set the ugly global here?
+				//FanElecPower = FanElecPowerHS * SRatio + FanElecPowerLS * ( 1.0 - SRatio ); // why set the ugly global here? 
 				FanCoil( FanCoilNum ).ElecPower = FanElecPowerHS * SRatio + FanElecPowerLS * ( 1.0 - SRatio );
 			}
 		}

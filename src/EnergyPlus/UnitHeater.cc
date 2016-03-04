@@ -137,7 +137,6 @@ namespace UnitHeater {
 	using DataGlobals::DisplayExtraWarnings;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SmallLoad;
-	using DataHVACGlobals::FanElecPower;
 	using DataHVACGlobals::SmallAirVolFlow;
 	using DataHVACGlobals::cFanTypes;
 	using DataHVACGlobals::CycFanCycCoil;
@@ -1341,7 +1340,6 @@ namespace UnitHeater {
 		bool UnitOn;
 
 		// initialize local variables
-		FanElecPower = 0.0;
 		QUnitOut = 0.0;
 		NoOutput = 0.0;
 		FullOutput = 0.0;
@@ -1502,7 +1500,11 @@ namespace UnitHeater {
 
 		// Report variables...
 		UnitHeat( UnitHeatNum ).HeatPower = max( 0.0, QUnitOut );
-		UnitHeat( UnitHeatNum ).ElecPower = FanElecPower;
+		if ( UnitHeat( UnitHeatNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+			UnitHeat( UnitHeatNum ).ElecPower = Fans::GetFanPower( UnitHeat( UnitHeatNum ).Fan_Index );
+		} else {
+			UnitHeat( UnitHeatNum ).ElecPower = HVACFan::fanObjs[ UnitHeat( UnitHeatNum ).Fan_Index ]->fanPower();
+		}
 
 		PowerMet = QUnitOut;
 		LatOutputProvided = LatentOutput;

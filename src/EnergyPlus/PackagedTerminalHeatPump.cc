@@ -398,7 +398,6 @@ namespace PackagedTerminalHeatPump {
 		Real64 QSensUnitOutNoATM; // sensible unit output excluding air added by supply side air terminal mixer
 
 		// zero the fan, DX coils, and supplemental electric heater electricity consumption
-		FanElecPower = 0.0;
 		DXElecCoolingPower = 0.0;
 		DXElecHeatingPower = 0.0;
 		ElecHeatingCoilPower = 0.0;
@@ -489,16 +488,23 @@ namespace PackagedTerminalHeatPump {
 		PTUnit( PTUnitNum ).LatCoolEnergyRate = std::abs( min( 0.0, ( QTotUnitOut - QSensUnitOutNoATM ) ) );
 		PTUnit( PTUnitNum ).LatHeatEnergyRate = std::abs( max( 0.0, ( QTotUnitOut - QSensUnitOutNoATM ) ) );
 
+		Real64 locFanElecPower = 0.0;
+		if ( PTUnit( PTUnitNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
+			locFanElecPower = Fans::GetFanPower( PTUnit( PTUnitNum ).FanIndex );
+		} else {
+			locFanElecPower = HVACFan::fanObjs[ PTUnit( PTUnitNum ).FanIndex ]->fanPower();
+		}
+
 		if ( PTUnit( PTUnitNum ).UnitType_Num == PTACUnit ) {
 			{ auto const SELECT_CASE_var( PTUnit( PTUnitNum ).ACHeatCoilType_Num );
 			if ( ( SELECT_CASE_var == Coil_HeatingGas ) || ( SELECT_CASE_var == Coil_HeatingElectric ) ) {
-				PTUnit( PTUnitNum ).ElecPower = FanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
+				PTUnit( PTUnitNum ).ElecPower = locFanElecPower + DXElecCoolingPower + ElecHeatingCoilPower;
 			} else if ( ( SELECT_CASE_var == Coil_HeatingWater ) || ( SELECT_CASE_var == Coil_HeatingSteam ) ) {
-				PTUnit( PTUnitNum ).ElecPower = FanElecPower + DXElecCoolingPower;
+				PTUnit( PTUnitNum ).ElecPower = locFanElecPower + DXElecCoolingPower;
 			} else {
 			}}
 		} else {
-			PTUnit( PTUnitNum ).ElecPower = FanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower;
+			PTUnit( PTUnitNum ).ElecPower = locFanElecPower + DXElecCoolingPower + DXElecHeatingPower + ElecHeatingCoilPower;
 		}
 
 	}
@@ -5501,7 +5507,7 @@ namespace PackagedTerminalHeatPump {
 		bool EconoActive; // TRUE if Economizer is active
 
 		// zero the fan, DX coils, and supplemental electric heater electricity consumption
-		FanElecPower = 0.0;
+
 		DXElecHeatingPower = 0.0;
 		DXElecCoolingPower = 0.0;
 		SaveCompressorPLR = 0.0;
