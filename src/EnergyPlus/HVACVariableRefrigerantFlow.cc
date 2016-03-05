@@ -2758,7 +2758,7 @@ namespace HVACVariableRefrigerantFlow {
 					VRFTU( VRFTUNum ).ActualFanVolFlowRate = HVACFan::fanObjs[VRFTU( VRFTUNum ).FanIndex ]->designAirVolFlowRate();
 					FanInletNodeNum = HVACFan::fanObjs[VRFTU( VRFTUNum ).FanIndex ]->inletNodeNum();
 					FanOutletNodeNum = HVACFan::fanObjs[VRFTU( VRFTUNum ).FanIndex ]->outletNodeNum();
-					VRFTU( VRFTUNum ).FanAvailSchedPtr = HVACFan::fanObjs[VRFTU( VRFTUNum ).FanIndex ]->availSchedIndex();
+					VRFTU( VRFTUNum ).FanAvailSchedPtr = HVACFan::fanObjs[ VRFTU( VRFTUNum ).FanIndex ]->availSchedIndex();
 				}
 			} else { // IF (FanType_Num == FanType_SimpleOnOff .OR. FanType_Num == FanType_SimpleConstVolume)THEN
 				ShowSevereError( cCurrentModuleObject + " = " + VRFTU( VRFTUNum ).Name );
