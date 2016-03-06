@@ -1406,7 +1406,14 @@ namespace HVACUnitarySystem {
 					UnitarySystem( UnitarySysNum ).CoolingFanSpeedRatio = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow / UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate;
 					UnitarySystem( UnitarySysNum ).NoHeatCoolSpeedRatio = UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow / UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate;
 					if ( UnitarySystem( UnitarySysNum ).FanExists ) {
-						if ( GetFanSpeedRatioCurveIndex( FanType, FanName, UnitarySystem( UnitarySysNum ).FanIndex ) > 0 ) {
+						bool fanHasPowerSpeedRatioCurve = false;
+						if ( UnitarySystem( UnitarySysNum ).FanType_Num == DataHVACGlobals::FanType_SystemModelObject ) {
+							if ( HVACFan::fanObjs[ UnitarySystem( UnitarySysNum ).FanIndex ]->getFanPowerCurveIndex() > 0 ) fanHasPowerSpeedRatioCurve = true;
+						} else {
+							if ( GetFanSpeedRatioCurveIndex( FanType, FanName, UnitarySystem( UnitarySysNum ).FanIndex ) > 0 ) fanHasPowerSpeedRatioCurve = true;
+						}
+						if ( fanHasPowerSpeedRatioCurve ) {
+
 							if ( UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow && UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow && UnitarySystem( UnitarySysNum ).ActualFanVolFlowRate == UnitarySystem( UnitarySysNum ).MaxNoCoolHeatAirVolFlow ) {
 								ShowWarningError( UnitarySystem( UnitarySysNum ).UnitarySystemType + " \"" + UnitarySystem( UnitarySysNum ).Name + "\"" );
 								ShowContinueError( "...For fan type and name = " + FanType + " \"" + FanName + "\"" );
@@ -4005,9 +4012,9 @@ namespace HVACUnitarySystem {
 
 						if ( UnitarySystem( UnitarySysNum ).FanExists ) {
 							errFlag = false;
-							GetFanIndex( FanName, FanIndex, errFlag, CurrentModuleObject );
 							SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, FanName );
-							SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, FanIndex );
+							SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, UnitarySystem( UnitarySysNum ).FanIndex );
+							SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, errFlag, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _,_, UnitarySystem( UnitarySysNum ).FanType_Num );
 							if ( errFlag ) {
 								ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 								ErrorsFound = true;
