@@ -2353,11 +2353,11 @@ See Figure 96 or Figure 97. This field applies only if Ventilation Control Mode 
 
 #### Field: Indoor and Outdoor Temperature Difference Lower Limit For Maximum Venting Open Factor
 
-See Figure 96. This field applies only if Ventilation Control Mode = Temperature. This value may be from zero to less than 100&deg;C, with the default being 0&deg;C. The value for this field must be less than the value specified for the following field.
+See Figure 96. This field applies only if Ventilation Control Mode = Temperature. This value may be from zero to less than 100˚C, with the default being 0˚C. The value for this field must be less than the value specified for the following field.
 
 #### Field: Indoor and Outdoor Temperature Difference Upper Limit for Minimun Venting Open Factor
 
-See Figure 96. This field applies only if Ventilation Control Mode = Temperature. This value must be greater than 0&deg;C, with the default being 100&deg;C. The value for this field must be greater than the value specified for the previous field..
+See Figure 96. This field applies only if Ventilation Control Mode = Temperature. This value must be greater than 0˚C, with the default being 100˚C. The value for this field must be greater than the value specified for the previous field..
 
 #### Field: Indoor and Outdoor Enthalpy Difference Lower Limit For Maximum Venting Open Factor
 
