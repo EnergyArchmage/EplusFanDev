@@ -450,6 +450,7 @@ namespace SolarShading {
 			WinDifSolar = 0.0;
 			WinDirSolTransAtIncAngle = 0.0;
 			WinHeatGain = 0.0;
+			WinHeatTransfer = 0.0;
 			WinHeatGainRep = 0.0;
 			WinHeatLossRep = 0.0;
 			WinGainConvGlazToZoneRep = 0.0;
@@ -514,6 +515,7 @@ namespace SolarShading {
 			WinHeatGainRepEnergy = 0.0;
 			WinHeatLossRepEnergy = 0.0;
 			WinGapConvHtFlowRepEnergy = 0.0;
+			WinHeatTransferRepEnergy = 0.0;
 			WinShadingAbsorbedSolarEnergy = 0.0;
 			ZoneTransSolarEnergy = 0.0;
 			ZoneBmSolFrExtWinsRepEnergy = 0.0;
@@ -779,6 +781,7 @@ namespace SolarShading {
 		WinDifSolar.dimension( TotSurfaces, 0.0 );
 		WinDirSolTransAtIncAngle.dimension( TotSurfaces, 0.0 );
 		WinHeatGain.dimension( TotSurfaces, 0.0 );
+		WinHeatTransfer.dimension( TotSurfaces, 0.0 );
 		WinHeatGainRep.dimension( TotSurfaces, 0.0 );
 		WinHeatLossRep.dimension( TotSurfaces, 0.0 );
 		WinGainConvGlazToZoneRep.dimension( TotSurfaces, 0.0 );

@@ -6131,7 +6131,8 @@ namespace SimAirServingZones {
 			}
 
 			// EMS calling point to customize zone sizing results
-			ManageEMS( emsCallFromSystemSizing );
+			bool anyEMSRan;
+			ManageEMS( emsCallFromSystemSizing, anyEMSRan );
 
 			//EMS override point
 			if ( AnyEnergyManagementSystemInModel ) {
