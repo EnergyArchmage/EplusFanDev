@@ -93,16 +93,19 @@ namespace DataSurfaces {
 	// Parameters to indicate surface shape for use with the Surface
 	// derived type (see below):
 
-	extern int const Triangle;
-	extern int const Quadrilateral;
-	extern int const Rectangle;
-	extern int const Polygonal;
-	extern int const RectangularDoorWindow;
-	extern int const RectangularOverhang;
-	extern int const RectangularLeftFin;
-	extern int const RectangularRightFin;
-	extern int const TriangularWindow;
-	extern int const TriangularDoor;
+	enum class SurfaceShape : int {
+		None = 0,
+		Triangle,
+		Quadrilateral,
+		Rectangle,
+		RectangularDoorWindow,
+		RectangularOverhang,
+		RectangularLeftFin,
+		RectangularRightFin,
+		TriangularWindow,
+		TriangularDoor,
+		Polygonal
+	};
 
 	// Parameters to indicate exterior boundary conditions for use with
 	// the Surface derived type (see below):
@@ -420,6 +423,8 @@ namespace DataSurfaces {
 	// zone-side of shade plus gap air convection to zone) + (IR and
 	// convection from frame) + (IR and convection from divider if no
 	// interior shade) (W)
+	extern Array1D< Real64 > WinHeatTransfer; // Total heat transfer through the window = WinTransSolar + conduction
+	// through glazing and frame
 	extern Array1D< Real64 > WinHeatGainRep; // Equals WinHeatGain when WinHeatGain >= 0.0
 	extern Array1D< Real64 > WinHeatLossRep; // Equals -WinHeatGain when WinHeatGain < 0.0
 
@@ -469,6 +474,7 @@ namespace DataSurfaces {
 	extern Array1D< Real64 > WinHeatLossRepEnergy; // Energy of WinHeatLossRep [J]
 	extern Array1D< Real64 > WinShadingAbsorbedSolarEnergy; // Energy of WinShadingAbsorbedSolar [J]
 	extern Array1D< Real64 > WinGapConvHtFlowRepEnergy; // Energy of WinGapConvHtFlowRep [J]
+	extern Array1D< Real64 > WinHeatTransferRepEnergy; // Energy of WinHeatTransfer [J]
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE DataSurfaces:
 
@@ -585,7 +591,7 @@ namespace DataSurfaces {
 		int ConstructionStoredInputValue; // holds the original value for Construction per surface input
 		int Class;
 		// Geometry related parameters
-		int Shape; // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
+		SurfaceShape Shape; // Surface shape (Triangle=1,Quadrilateral=2,Rectangle=3,
 		//                Rectangular Window/Door=4,Rectangular Overhang=5,
 		//                Rectangular Left Fin=6,Rectangular Right Fin=7,
 		//                Triangular Window=8)
@@ -756,7 +762,7 @@ namespace DataSurfaces {
 			EMSConstructionOverrideValue( 0 ),
 			ConstructionStoredInputValue( 0 ),
 			Class( 0 ),
-			Shape( 0 ),
+			Shape( SurfaceShape::None ),
 			Sides( 0 ),
 			Area( 0.0 ),
 			GrossArea( 0.0 ),

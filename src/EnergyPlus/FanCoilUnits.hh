@@ -170,7 +170,7 @@ namespace FanCoilUnits {
 		std::string FanName; // name of fan
 		std::string FanType; // type of fan
 		int FanIndex; // index for fan
-		std::unique_ptr< HVACFan::FanSystem > fanObj;
+		HVACFan::FanSystem fanObj( std::string const n );
 		std::string CCoilName; // name of cooling coil
 		int CCoilName_Index; // Index for this Cooling Coil in SimWaterComp
 		std::string CCoilType; // type of cooling coil:
