@@ -764,7 +764,7 @@ namespace HVACStandAloneERV {
 
 		}
 
-		OutAirNum = GetNumObjectsFound( "Controller:OutdoorAir" );
+		int OutAirNum = 0;
 		CurrentModuleObject = "ZoneHVAC:EnergyRecoveryVentilator:Controller";
 		NumERVCtrlrs = GetNumObjectsFound( CurrentModuleObject );
 
@@ -773,7 +773,7 @@ namespace HVACStandAloneERV {
 
 			IsNotOK = false;
 			IsBlank = false;
-			CheckOAControllerName( Alphas( 1 ), OutAirNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			CheckOAControllerName( Alphas( 1 ), ERVControllerNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			if ( IsNotOK ) {
 				ErrorsFound = true;
 				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
