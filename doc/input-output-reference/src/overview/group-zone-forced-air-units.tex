@@ -571,6 +571,8 @@ This field specifies the type of supply air fan object used by this fan coil. Th
 
 \begin{itemize}
 \item
+  Fan:SystemModel
+\item
   Fan:OnOff
 \item
   Fan:ConstantVolume
@@ -578,13 +580,15 @@ This field specifies the type of supply air fan object used by this fan coil. Th
   Fan:VariableVolume
 \end{itemize}
 
+Note that Fan:SystemModel was added as of version 8.6 and is recommended for use in new models.  Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume may be deprecated in a future version.
+
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-000}
 
-The name of a fan component that composes part of the fan coil unit. Note that the fan's maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for \emph{ConstantFanVariableFlow~} a \emph{Fan:OnOff} or \emph{Fan:ConstantVolume} should be used. For \emph{CyclingFan}, a \emph{Fan:OnOff} should be used. For \emph{VariableFanVariableFlow} or \emph{VariableFanConstantFlow} a \emph{Fan:VariableVolume} should be chosen. For \emph{MultiSpeedFan} a \emph{Fan:OnOff} should be used. And for \emph{ASHRAE90VariableFan}, a \emph{Fan:OnOff} or \emph{Fan:VariableVolume} should be chosen.
+The name of a fan component that composes part of the fan coil unit. Note that the fan's maximum flow rate should be the same as the maximum airflow rate of the fan coil unit and the type of fan object should correspond to the capacity control method. Namely, for \emph{ConstantFanVariableFlow~} a \emph{Fan:SystemModel}, \emph{Fan:OnOff}, or \emph{Fan:ConstantVolume} should be used. For \emph{CyclingFan}, a \emph{Fan:OnOff} or \emph{Fan:SystemModel} should be used. For \emph{VariableFanVariableFlow} or \emph{VariableFanConstantFlow} a \emph{Fan:SystemModel} or \emph{Fan:VariableVolume} should be chosen. For \emph{MultiSpeedFan} a \emph{Fan:SystemModel} or \emph{Fan:OnOff} should be used. And for \emph{ASHRAE90VariableFan}, a \emph{Fan:SystemModel}, \emph{Fan:OnOff}, or \emph{Fan:VariableVolume} should be chosen.
 
 \begin{lstlisting}
-The fan’s inlet node should be the same as the outdoor air mixer’s mixed air node.
-The fan’s outlet node should be the same as the cooling coil’s air inlet node.
+The fan's inlet node should be the same as the outdoor air mixer's mixed air node.
+The fan's outlet node should be the same as the cooling coil's air inlet node.
 \end{lstlisting}
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-003}
@@ -979,6 +983,8 @@ This field specifies the type of supply air fan used by this unit ventilator. Th
 
 \begin{itemize}
 \item
+  Fan:SystemModel
+\item
   Fan:OnOff
 \item
   Fan:ConstantVolume
@@ -986,9 +992,11 @@ This field specifies the type of supply air fan used by this unit ventilator. Th
   Fan:VariableVolume
 \end{itemize}
 
+Note that Fan:SystemModel was added as of version 8.6 and is recommended for use in new models.  Fan:OnOff, Fan:ConstantVolume, and Fan:VariableVolume may be deprecated in a future version.
+
 \paragraph{Field: Supply Air Fan Name}\label{field-supply-air-fan-name-1-000}
 
-This field is the name of a fan (ref: Fan:OnOff, Fan:ConstantVolume, Fan: VariableVolume) that is part of the unit ventilator system. This name links the unit ventilator to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the unit ventilator system.
+This field is the name of a fan (ref: Fan:SystemModel, Fan:OnOff, Fan:ConstantVolume, Fan: VariableVolume) that is part of the unit ventilator system. This name links the unit ventilator to particular fan data entered elsewhere in the input data file. A fan name is required since it is the prime mover of air in the unit ventilator system.
 
 \paragraph{Field: Coil Option}\label{field-coil-option}
 
