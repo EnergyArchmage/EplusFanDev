@@ -535,7 +535,8 @@ namespace HVACFan {
 			SetupEMSActuator( "Fan",name_ , "Fan Total Efficiency", "[fraction]", eMSFanEffOverrideOn_, eMSFanEffValue_ );
 			SetupEMSActuator( "Fan", name_ , "Fan Autosized Air Flow Rate", "[m3/s]", maxAirFlowRateEMSOverrideOn_, maxAirFlowRateEMSOverrideValue_ );
 		}
-		EMSManager::ManageEMS( DataGlobals::emsCallFromComponentGetInput );
+		bool anyEMSRan = false;
+		EMSManager::ManageEMS( DataGlobals::emsCallFromComponentGetInput , anyEMSRan );
 	}
 
 	void

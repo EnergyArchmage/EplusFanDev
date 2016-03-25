@@ -234,13 +234,24 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	HeatingLoad = true;
 	CoolingLoad = false;
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.6, CompOffMassFlow );
+	EXPECT_EQ( 1.2, CompOnMassFlow );
 	EXPECT_EQ( 0.6, MSHPMassFlowRateLow );
 	EXPECT_EQ( 1.2, MSHPMassFlowRateHigh );
+
+	PartLoadRatio = 0.5;
+	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.6, CompOffMassFlow );
+	EXPECT_EQ( 1.2, CompOnMassFlow );
+	EXPECT_EQ( 0.6, MSHPMassFlowRateLow );
+	EXPECT_EQ( 1.2, MSHPMassFlowRateHigh );
+
+	PartLoadRatio = 1.0;
 	MoistureLoad = 0.0;
 	UnitarySystem( UnitarySysNum ).Humidistat = false;
 	UnitarySystem( UnitarySysNum ).DehumidControlType_Num = DataSizing::None;
 
-	// cycling fan mode should drop to idle flow rate as speed = 1
+	// cycling fan mode should drop to idle flow rate only below speed = 1
 	UnitarySystem( UnitarySysNum ).FanOpMode = CycFanCycCoil;
 
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 1;
@@ -248,7 +259,9 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	HeatingLoad = true;
 	CoolingLoad = false;
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
-	EXPECT_EQ( 0.20, MSHPMassFlowRateLow );
+	EXPECT_EQ( 0.25, CompOffMassFlow );
+	EXPECT_EQ( 0.25, CompOnMassFlow );
+	EXPECT_EQ( 0.25, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.25, MSHPMassFlowRateHigh );
 
 	// cooling load at various speeds
@@ -274,10 +287,12 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	HeatingLoad = false;
 	CoolingLoad = true;
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.2, CompOffMassFlow ); // CompOffMassFlow equal to idle mass flow rate
+	EXPECT_EQ( 0.3, CompOnMassFlow );
 	EXPECT_EQ( 0.2, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
 
-	// constant fan mode should not drop to idle flow rate as speed = 1
+	// constant fan mode should not drop to idle flow rate at speed = 1
 	UnitarySystem( UnitarySysNum ).FanOpMode = ContFanCycCoil;
 
 	UnitarySystem( UnitarySysNum ).HeatingSpeedNum = 0;
@@ -285,6 +300,8 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	HeatingLoad = false;
 	CoolingLoad = true;
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.3, CompOffMassFlow ); // CompOffMassFlow equal to speed 1 mass flow rate
+	EXPECT_EQ( 0.3, CompOnMassFlow );
 	EXPECT_EQ( 0.3, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.3, MSHPMassFlowRateHigh );
 
@@ -294,6 +311,8 @@ TEST_F( EnergyPlusFixture, SetOnOffMassFlowRateTest )
 	HeatingLoad = false;
 	CoolingLoad = false;
 	SetOnOffMassFlowRate( UnitarySysNum, OnOffAirFlowRatio, PartLoadRatio );
+	EXPECT_EQ( 0.2, CompOffMassFlow ); // CompOffMassFlow equal to spped 1 mass flow rate
+	EXPECT_EQ( 0.2, CompOnMassFlow );
 	EXPECT_EQ( 0.2, MSHPMassFlowRateLow );
 	EXPECT_EQ( 0.2, MSHPMassFlowRateHigh );
 
@@ -1036,6 +1055,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_GetInput ) {
 	Schedule( 1 ).CurrentValue = 1.0;
 	DataGlobals::BeginEnvrnFlag = true;
 	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize RhoAir
+	Node( InletNode ).MassFlowRateMaxAvail = UnitarySystem( 1 ).MaxCoolAirVolFlow * StdRhoAir;
 
 	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
 
@@ -1829,6 +1849,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_VarSpeedCoils ) {
 	Schedule( 1 ).CurrentValue = 1.0;
 	DataGlobals::BeginEnvrnFlag = true;
 	DataEnvironment::StdRhoAir = PsyRhoAirFnPbTdbW( 101325.0, 20.0, 0.0 ); // initialize RhoAir
+	Node( InletNode ).MassFlowRateMaxAvail = UnitarySystem( 1 ).MaxCoolAirVolFlow * StdRhoAir;
 
 	SetPredefinedTables();
 	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), _, _, _, _, true );
@@ -4001,6 +4022,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 
 	int Iter;
 	Real64 StdRhoAir = 1.2;
+	Node( InletNode ).MassFlowRateMaxAvail = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow * StdRhoAir;
 	Iter = 4;
 	UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow * DesignSpecMSHP( 1 ).CoolingVolFlowRatio( Iter );
 	UnitarySystem( UnitarySysNum ).CoolMassFlowRate( Iter ) = UnitarySystem( UnitarySysNum ).CoolVolumeFlowRate( Iter ) * StdRhoAir;
@@ -4076,7 +4098,7 @@ TEST_F( EnergyPlusFixture, UnitarySystem_MultiSpeedCoils_SingleMode ) {
 	DataEnvironment::OutBaroPress = 101325.0;
 
 	SimUnitarySystem( UnitarySystem( 1 ).Name, FirstHVACIteration, UnitarySystem( 1 ).ControlZoneNum, ZoneEquipList( 1 ).EquipIndex( 1 ), true, _, _, _, _ );
-	EXPECT_NEAR( 0.153581, UnitarySystem( UnitarySysNum ).CycRatio, 0.0001 ); // cycling ratio
+	EXPECT_NEAR( 0.16177, UnitarySystem( UnitarySysNum ).CycRatio, 0.0001 ); // cycling ratio
 	EXPECT_EQ( 1, UnitarySystem( UnitarySysNum ).HeatingSpeedNum );
 	EXPECT_EQ( 0.0, UnitarySystem( UnitarySysNum ).HeatingSpeedRatio );
 
