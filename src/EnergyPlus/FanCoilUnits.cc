@@ -3232,10 +3232,9 @@ namespace FanCoilUnits {
 			if ( FanCoil( FanCoilNum ).FanType_Num != DataHVACGlobals::FanType_SystemModelObject ) {
 				SimulateFanComponents( FanCoil( FanCoilNum ).FanName, FirstHVACIteration, FanCoil( FanCoilNum ).FanIndex, FanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 			} else {
-				// FanFlowRatio need to be accurate here for new fan model
-
-
-				HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( FanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff ,_ );
+				// FanFlowRatio needs to be accurate here for new fan model
+				Real64 ActFanFlowRatio = FanFlowRatio * PartLoad;
+				HVACFan::fanObjs[ FanCoil( FanCoilNum ).FanIndex ]->simulate( ActFanFlowRatio, ZoneCompTurnFansOn, ZoneCompTurnFansOff ,_ );
 			}
 			if ( FanCoil( FanCoilNum ).CCoilType_Num == CCoil_HXAssist ) {
 				SimHXAssistedCoolingCoil( FanCoil( FanCoilNum ).CCoilName, FirstHVACIteration, On, 0.0, FanCoil( FanCoilNum ).CCoilName_Index, ContFanCycCoil );
@@ -3246,7 +3245,7 @@ namespace FanCoilUnits {
 
 		} else { // capacity control method is VariableFanVariableFlow, VariableFanConstantFlow, or ASHRAE90.1
 
-			// calculate fan speed ratio for Fan:OnOff (not used for other fan types). Only used in fan model if performance curves are present.
+			// calculate fan speed ratio for Fan:OnOff of Fan:SystemModel(not used for other fan types). Only used in fan model if performance curves are present.
 			FanSpeedRatio = Node( InletNode ).MassFlowRate / ( FanCoil( FanCoilNum ).FanAirVolFlow * StdRhoAir );
 
 			// Constant fan and variable flow calculation AND variable fan

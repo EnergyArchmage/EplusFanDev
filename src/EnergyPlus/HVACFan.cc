@@ -626,8 +626,13 @@ namespace HVACFan {
 						fanRunTimeFractionAtSpeed_[ lowSideSpeed ] = ( flowFractionAtSpeed_[ hiSideSpeed ] - localFlowFraction ) / ( flowFractionAtSpeed_[ hiSideSpeed ] - flowFractionAtSpeed_[ lowSideSpeed ] );
 						fanRunTimeFractionAtSpeed_[ hiSideSpeed ] = ( localFlowFraction - flowFractionAtSpeed_[ lowSideSpeed ] ) / ( flowFractionAtSpeed_[ hiSideSpeed ] - flowFractionAtSpeed_[ lowSideSpeed ] );
 					}
-					fanPower_ = fanRunTimeFractionAtSpeed_[ lowSideSpeed ] * massFlowAtSpeed_[ lowSideSpeed ] * localPressureRise / ( totEfficAtSpeed_[ lowSideSpeed ] * rhoAirStdInit_ ) + fanRunTimeFractionAtSpeed_[ hiSideSpeed ] * massFlowAtSpeed_[ hiSideSpeed ] * localPressureRise / ( totEfficAtSpeed_[ hiSideSpeed ] * rhoAirStdInit_ );
-										Real64 fanShaftPower = motorEff_ * fanPower_;
+					if ( lowSideSpeed != -1 && hiSideSpeed != -1 ) {
+						fanPower_ = fanRunTimeFractionAtSpeed_[ lowSideSpeed ] * massFlowAtSpeed_[ lowSideSpeed ] * localPressureRise / ( totEfficAtSpeed_[ lowSideSpeed ] * rhoAirStdInit_ ) + fanRunTimeFractionAtSpeed_[ hiSideSpeed ] * massFlowAtSpeed_[ hiSideSpeed ] * localPressureRise / ( totEfficAtSpeed_[ hiSideSpeed ] * rhoAirStdInit_ );
+					} else if ( lowSideSpeed == -1 && hiSideSpeed == 0 ) {
+						fanPower_ = fanRunTimeFractionAtSpeed_[ hiSideSpeed ] * massFlowAtSpeed_[ hiSideSpeed ] * localPressureRise / ( totEfficAtSpeed_[ hiSideSpeed ] * rhoAirStdInit_ );
+					}
+					
+					Real64 fanShaftPower = motorEff_ * fanPower_;
 					Real64 powerLossToAir = fanShaftPower + ( fanPower_ - fanShaftPower )* motorInAirFrac_;
 					outletAirEnthalpy_ = inletAirEnthalpy_ + powerLossToAir / localAirMassFlow;
 					outletAirHumRat_ = inletAirHumRat_;
